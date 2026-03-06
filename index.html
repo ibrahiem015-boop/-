@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - منصة الفيديو</title>
+    <title>حصريات - رفع ذكي للكميات الكبيرة</title>
     <style>
         * {
             margin: 0;
@@ -505,7 +505,7 @@
         }
 
         .files-list {
-            max-height: 250px;
+            max-height: 300px;
             overflow-y: auto;
             background: #222;
             border-radius: 25px;
@@ -551,6 +551,11 @@
             background: #4ecdc4;
             color: white;
             animation: pulse 1s infinite;
+        }
+
+        .file-item .status.error {
+            background: #ff4757;
+            color: white;
         }
 
         @keyframes pulse {
@@ -1086,11 +1091,49 @@
             font-size: 11px;
             cursor: pointer;
         }
+
+        /* مؤشر التقدم للكميات الكبيرة */
+        .batch-progress {
+            background: #222;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .progress-text {
+            color: #4ecdc4;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning-badge {
+            background: #ffa502;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - منصة الفيديو ✨
+        ✨ حصريات - رفع ذكي (يتحمل 100+ مقطع) ✨
     </div>
 
     <!-- صفحة تسجيل الدخول -->
@@ -1098,7 +1141,7 @@
         <div class="login-card">
             <div class="login-header">
                 <h1>🎬</h1>
-                <p>حصريات - تسجيل الدخول</p>
+                <p>حصريات - رفع ذكي</p>
             </div>
             
             <form id="loginForm">
@@ -1203,7 +1246,7 @@
                         <span>👤</span> إنشاء حساب (يدوي)
                     </button>
                     <button class="dev-btn" id="pendingRequestsBtn">
-                        <span>📋</span> طلبات اشتراك
+                        <span>📋</span> المستخدمين
                     </button>
                     <button class="dev-btn" id="showPublishPageBtn">
                         <span>📢</span> نشر مقاطع
@@ -1214,7 +1257,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (للمطور فقط)
+                    <span>📦</span> رفع مقاطع (يتحمل 100+ مقطع)
                 </button>
             </div>
 
@@ -1265,7 +1308,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع مقاطع (للمطور فقط)</h2>
+            <h2>📦 رفع ذكي <span class="warning-badge">يتحمل 100+ مقطع</span></h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1277,8 +1320,12 @@
                 
                 <div class="files-list" id="filesList"></div>
                 
-                <div id="uploadProgress" style="text-align: center; color: #4ecdc4; margin: 10px 0; display: none;">
-                    جاري تحويل وحفظ المقاطع...
+                <div id="batchProgress" class="batch-progress" style="display: none;">
+                    <div class="progress-text" id="progressText">جاري التجهيز...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div style="color:#888; font-size:12px; margin-top:10px;" id="progressDetails"></div>
                 </div>
                 
                 <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>رفع وحفظ المقاطع</button>
@@ -1329,7 +1376,7 @@
 
     <div class="exit-modal" id="pendingModal">
         <div class="exit-content" style="max-width: 320px;">
-            <h3>📋 طلبات الاشتراك</h3>
+            <h3>📋 قائمة المستخدمين</h3>
             <div id="pendingList" style="max-height: 250px; overflow-y: auto; margin: 15px 0;"></div>
             <button class="exit-btn no" style="width:100%;" id="closePendingModal">إغلاق</button>
         </div>
@@ -1347,7 +1394,7 @@
     </div>
 
     <script>
-        // ========== حساب المطور (مخفي وما يظهر) ==========
+        // ========== حساب المطور ==========
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
         const DEVELOPER_NAME = 'مدير النظام';
@@ -1374,6 +1421,10 @@
         const DB_NAME = 'HasryatVideosDB';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
+
+        // إعدادات الرفع للكميات الكبيرة
+        const BATCH_SIZE = 5; // نرفع 5 مقاطع كل مرة
+        const MAX_CONCURRENT = 3; // 3 مقاطع متوازية
 
         // فتح قاعدة البيانات
         function openDB() {
@@ -1435,6 +1486,32 @@
             }
         }
 
+        // حفظ مجموعة فيديوهات (دفعة واحدة)
+        async function saveVideoBatch(videosBatch) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    
+                    let completed = 0;
+                    for (const video of videosBatch) {
+                        const request = store.put(video);
+                        request.onsuccess = () => {
+                            completed++;
+                            if (completed === videosBatch.length) {
+                                resolve();
+                            }
+                        };
+                        request.onerror = () => reject(request.error);
+                    }
+                });
+            } catch (e) {
+                console.log('خطأ في حفظ الدفعة:', e);
+                throw e;
+            }
+        }
+
         // حذف فيديو
         async function deleteVideoFromDB(id) {
             try {
@@ -1480,7 +1557,6 @@
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
-                    // نتأكد أن المطور موجود
                     if (!users[DEVELOPER_EMAIL]) {
                         users[DEVELOPER_EMAIL] = {
                             email: DEVELOPER_EMAIL,
@@ -1498,14 +1574,96 @@
             saveUsers();
         }
 
-        // ========== تحويل الملف إلى Base64 ==========
+        // ========== تحويل الملف إلى Base64 (مع تحسين للأداء) ==========
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
+                
+                // مهلة زمنية للملفات الكبيرة
+                setTimeout(() => {
+                    if (reader.readyState !== 2) {
+                        reader.abort();
+                        reject(new Error('تجاوز الوقت للملف: ' + file.name));
+                    }
+                }, 30000); // 30 ثانية كحد أقصى
             });
+        }
+
+        // ========== رفع ذكي للكميات الكبيرة ==========
+        async function uploadLargeBatch(files, progressCallback) {
+            const results = [];
+            const total = files.length;
+            let completed = 0;
+            let failed = 0;
+            
+            // تقسيم الملفات إلى دفعات صغيرة
+            for (let i = 0; i < files.length; i += BATCH_SIZE) {
+                const batch = files.slice(i, i + BATCH_SIZE);
+                const batchPromises = [];
+                
+                // معالجة الدفعة بالتوازي (لكن بعدد محدود)
+                for (const file of batch) {
+                    const promise = (async () => {
+                        try {
+                            const base64Data = await fileToBase64(file);
+                            
+                            const today = new Date();
+                            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                            const day = today.getDate().toString().padStart(2, '0');
+                            
+                            const videoData = {
+                                id: Date.now() + Math.random() + completed,
+                                name: file.name,
+                                url: base64Data,
+                                date: `${month}-${day}`,
+                                size: file.size,
+                                type: file.type,
+                                uploadedBy: currentUser.email,
+                                uploadedAt: new Date().toISOString()
+                            };
+                            
+                            completed++;
+                            progressCallback(completed, total, file.name, true);
+                            return videoData;
+                        } catch (error) {
+                            failed++;
+                            progressCallback(completed, total, file.name, false, error.message);
+                            return null;
+                        }
+                    })();
+                    
+                    batchPromises.push(promise);
+                    
+                    // التحكم بعدد المقاطع المتوازية
+                    if (batchPromises.length >= MAX_CONCURRENT) {
+                        const batchResults = await Promise.all(batchPromises);
+                        results.push(...batchResults.filter(r => r !== null));
+                        batchPromises.length = 0;
+                        
+                        // نوقف شوي عشان ما نضغط على المتصفح
+                        await new Promise(r => setTimeout(r, 100));
+                    }
+                }
+                
+                // انتظار باقي المقاطع في الدفعة
+                if (batchPromises.length > 0) {
+                    const batchResults = await Promise.all(batchPromises);
+                    results.push(...batchResults.filter(r => r !== null));
+                }
+                
+                // حفظ الدفعة في قاعدة البيانات
+                if (results.length > 0) {
+                    await saveVideoBatch(results.slice(-batch.length));
+                }
+                
+                // تحديث الواجهة
+                progressCallback(completed, total, null, true, null, true);
+            }
+            
+            return { results, failed };
         }
 
         // ========== حساب المساحة المستخدمة ==========
@@ -1523,7 +1681,7 @@
                 const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
                 document.getElementById('storageUsed').textContent = sizeMB;
                 
-                const percentage = Math.min(100, (totalSize / (500 * 1024 * 1024)) * 100);
+                const percentage = Math.min(100, (totalSize / (1024 * 1024 * 1024)) * 100); // 1 GB كحد أقصى للعرض
                 document.getElementById('storageBar').style.width = percentage + '%';
                 
                 document.getElementById('videoCount').textContent = `(${videos.length} مقطع)`;
@@ -1604,6 +1762,10 @@
         const filesList = document.getElementById('filesList');
         const uploadSubmitBtn = document.getElementById('uploadSubmitBtn');
         const uploadProgress = document.getElementById('uploadProgress');
+        const batchProgress = document.getElementById('batchProgress');
+        const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+        const progressDetails = document.getElementById('progressDetails');
 
         const subscriptionInfo = document.getElementById('subscriptionInfo');
         const subscriptionModal = document.getElementById('subscriptionModal');
@@ -1661,7 +1823,6 @@
                 return;
             }
             
-            // حساب تاريخ انتهاء الاشتراك (افتراضي 30 يوم تجريبي)
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 30);
             
@@ -1679,13 +1840,11 @@
             
             alert('✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن');
             
-            // تنظيف الحقول
             registerName.value = '';
             registerEmail.value = '';
             registerPassword.value = '';
             registerConfirmPassword.value = '';
             
-            // العودة لصفحة تسجيل الدخول
             registerPage.style.display = 'none';
             loginPage.style.display = 'flex';
         });
@@ -1750,7 +1909,6 @@
             
             videos = await loadVideos();
             
-            // تصفية الفيديوهات حسب المستخدم (كل مستخدم يرى فيديوهاته فقط)
             if (!user.isDeveloper) {
                 videos = videos.filter(v => v.uploadedBy === user.email);
             }
@@ -1883,7 +2041,7 @@
                 return;
             }
             
-            videos.forEach((video, index) => {
+            videos.slice(0, 30).forEach((video, index) => {
                 const videoCard = document.createElement('div');
                 videoCard.className = 'video-card';
                 
@@ -1916,6 +2074,16 @@
                 
                 videosGrid.appendChild(videoCard);
             });
+            
+            if (videos.length > 30) {
+                const moreDiv = document.createElement('div');
+                moreDiv.style.gridColumn = '1/-1';
+                moreDiv.style.textAlign = 'center';
+                moreDiv.style.padding = '20px';
+                moreDiv.style.color = '#888';
+                moreDiv.innerHTML = `... و ${videos.length - 30} مقطع آخر`;
+                videosGrid.appendChild(moreDiv);
+            }
             
             totalVideosSpan.textContent = videos.length;
             
@@ -2030,7 +2198,7 @@
                 return;
             }
             
-            videos.forEach((video, index) => {
+            videos.slice(0, 50).forEach((video, index) => {
                 const item = document.createElement('div');
                 item.className = 'publish-item';
                 item.dataset.index = index;
@@ -2115,7 +2283,7 @@
             });
         }
 
-        // ========== رفع الملفات بشكل دائم ==========
+        // ========== رفع ذكي للكميات الكبيرة ==========
         function resetUploadForm() {
             selectedFiles = [];
             if (fileInput) fileInput.value = '';
@@ -2123,7 +2291,7 @@
             if (counter) counter.innerHTML = '0 مقطع';
             if (filesList) filesList.innerHTML = '';
             if (uploadSubmitBtn) uploadSubmitBtn.disabled = true;
-            if (uploadProgress) uploadProgress.style.display = 'none';
+            batchProgress.style.display = 'none';
         }
 
         function showSaveBadge(text) {
@@ -2152,12 +2320,16 @@
             if (selectedFiles.length > 0) {
                 uploadSubmitBtn.disabled = false;
                 fileLabel.innerHTML = '📦 ' + selectedFiles.length;
+                
+                if (selectedFiles.length > 20) {
+                    fileLabel.innerHTML += ' ⚠️ كمية كبيرة';
+                }
             } else {
                 uploadSubmitBtn.disabled = true;
                 fileLabel.innerHTML = '📁';
             }
             
-            selectedFiles.forEach((file, index) => {
+            selectedFiles.slice(0, 50).forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.id = 'file-' + index;
@@ -2168,6 +2340,15 @@
                 `;
                 filesList.appendChild(fileItem);
             });
+            
+            if (selectedFiles.length > 50) {
+                const moreDiv = document.createElement('div');
+                moreDiv.style.textAlign = 'center';
+                moreDiv.style.padding = '10px';
+                moreDiv.style.color = '#888';
+                moreDiv.innerHTML = `... و ${selectedFiles.length - 50} ملف آخر`;
+                filesList.appendChild(moreDiv);
+            }
         }
 
         if (uploadSubmitBtn) {
@@ -2181,60 +2362,57 @@
                 
                 uploadSubmitBtn.disabled = true;
                 fileInput.disabled = true;
-                uploadProgress.style.display = 'block';
+                batchProgress.style.display = 'block';
                 
-                for (let i = 0; i < selectedFiles.length; i++) {
+                for (let i = 0; i < Math.min(selectedFiles.length, 50); i++) {
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
-                        statusEl.className = 'status uploading';
+                        statusEl.className = 'status pending';
                         statusEl.innerHTML = '⏳';
                     }
                 }
                 
                 try {
-                    for (let i = 0; i < selectedFiles.length; i++) {
-                        const file = selectedFiles[i];
-                        
-                        const base64Data = await fileToBase64(file);
-                        
-                        const today = new Date();
-                        const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                        const day = today.getDate().toString().padStart(2, '0');
-                        
-                        const videoData = {
-                            id: Date.now() + i + Math.random(),
-                            name: file.name,
-                            url: base64Data,
-                            date: `${month}-${day}`,
-                            size: file.size,
-                            type: file.type,
-                            uploadedBy: currentUser.email,
-                            uploadedAt: new Date().toISOString()
-                        };
-                        
-                        await saveVideo(videoData);
-                        
-                        // إذا كان المطور يشوف كل الفيديوهات
-                        if (currentUser.isDeveloper) {
-                            videos.push(videoData);
-                        }
-                        
-                        const statusEl = document.getElementById('status-' + i);
-                        if (statusEl) {
-                            statusEl.className = 'status success';
-                            statusEl.innerHTML = '✅';
-                        }
-                    }
+                    const startTime = Date.now();
                     
-                    if (currentUser.isDeveloper) {
-                        videos.sort((a, b) => (b.id || 0) - (a.id || 0));
+                    const { results, failed } = await uploadLargeBatch(selectedFiles, (completed, total, fileName, success, error, isBatch) => {
+                        const percentage = Math.round((completed / total) * 100);
+                        progressFill.style.width = percentage + '%';
+                        progressText.innerHTML = `جاري الرفع: ${completed} من ${total}`;
+                        progressDetails.innerHTML = `✅ نجح: ${completed - failed} | ❌ فشل: ${failed}`;
+                        
+                        if (fileName && !isBatch) {
+                            const fileIndex = selectedFiles.findIndex(f => f.name === fileName);
+                            if (fileIndex >= 0 && fileIndex < 50) {
+                                const statusEl = document.getElementById('status-' + fileIndex);
+                                if (statusEl) {
+                                    if (success) {
+                                        statusEl.className = 'status success';
+                                        statusEl.innerHTML = '✅';
+                                    } else {
+                                        statusEl.className = 'status error';
+                                        statusEl.innerHTML = '❌';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // تحميل كل الفيديوهات المرفوعة
+                    videos = await loadVideos();
+                    if (!currentUser.isDeveloper) {
+                        videos = videos.filter(v => v.uploadedBy === currentUser.email);
                     }
                     
                     renderVideos();
                     updateStorageInfo();
                     
-                    uploadProgress.innerHTML = '✅ تم حفظ جميع المقاطع!';
-                    showSaveBadge('تم الحفظ');
+                    const endTime = Date.now();
+                    const timeSeconds = ((endTime - startTime) / 1000).toFixed(1);
+                    
+                    progressText.innerHTML = `✅ اكتمل! تم رفع ${results.length} مقطع بنجاح (${failed} فشل) في ${timeSeconds} ثانية`;
+                    
+                    showSaveBadge('تم الرفع');
                     
                     setTimeout(() => {
                         mainPage.classList.add('active');
@@ -2243,11 +2421,11 @@
                         fileInput.disabled = false;
                         
                         welcomeAlert.style.display = 'block';
-                        welcomeAlert.innerHTML = `✅ تم رفع ${selectedFiles.length} مقاطع بنجاح!`;
+                        welcomeAlert.innerHTML = `✅ تم رفع ${results.length} مقاطع! ${failed > 0 ? `(${failed} فشل)` : ''}`;
                         setTimeout(() => {
                             welcomeAlert.style.display = 'none';
                         }, 3000);
-                    }, 1000);
+                    }, 1500);
                     
                 } catch (error) {
                     alert('خطأ في رفع الملف: ' + error.message);
@@ -2312,7 +2490,6 @@
                     return;
                 }
                 
-                // عرض المستخدمين المسجلين
                 const userList = Object.values(users)
                     .filter(u => !u.isDeveloper)
                     .map(u => `
