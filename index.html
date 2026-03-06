@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حصريات - منصة الفيديو</title>
+    <title>حصريات - نظام الأزرار الذكية</title>
     <style>
         * {
             margin: 0;
@@ -59,10 +59,6 @@
             cursor: pointer;
         }
 
-        .user-badge:hover {
-            background: #444;
-        }
-
         .dev-badge {
             background: #ff6b6b;
             color: white;
@@ -74,11 +70,6 @@
             justify-content: center;
             cursor: pointer;
             font-size: 20px;
-            transition: 0.3s;
-        }
-
-        .dev-badge:hover {
-            transform: scale(1.1);
         }
 
         .logout-btn {
@@ -90,11 +81,6 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            transform: scale(1.1);
         }
 
         /* ===== الألوان المتحركة ===== */
@@ -115,7 +101,6 @@
             color: white;
             font-weight: bold;
             font-size: 18px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         /* ===== إحصائيات ===== */
@@ -220,7 +205,6 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
             color: white;
             display: block;
         }
@@ -265,12 +249,6 @@
             display: block;
         }
 
-        .upload-page h2 {
-            color: white;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
         .file-label {
             display: flex;
             align-items: center;
@@ -282,12 +260,7 @@
             cursor: pointer;
             color: #4ecdc4;
             font-size: 60px;
-            transition: 0.3s;
             background: #222;
-        }
-
-        .file-label:hover {
-            background: rgba(78, 205, 196, 0.1);
         }
 
         #fileInput {
@@ -319,14 +292,6 @@
             font-size: 13px;
         }
 
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-item .size {
-            color: #888;
-        }
-
         .upload-action-btn {
             width: 100%;
             padding: 18px;
@@ -353,10 +318,6 @@
             padding: 10px;
         }
 
-        .back-btn:hover {
-            color: #4ecdc4;
-        }
-
         /* ===== مؤشر التحميل ===== */
         .upload-progress {
             position: fixed;
@@ -369,7 +330,6 @@
             padding: 20px;
             display: none;
             z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
         .progress-header {
@@ -522,21 +482,11 @@
             border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            transition: 0.3s;
         }
 
         .play-btn {
             background: #4ecdc4;
             color: black;
-        }
-
-        .play-btn:hover {
-            background: #ff6b6b;
-            color: white;
         }
 
         .download-btn {
@@ -545,34 +495,20 @@
             border: 1px solid #4ecdc4;
         }
 
-        .download-btn:hover {
-            background: #4ecdc4;
-            color: black;
-        }
-
         .download-btn.dev-only {
             display: none;
         }
 
         .download-btn.dev-only.visible {
-            display: flex;
+            display: block;
         }
 
-        /* ===== عناصر المطور فقط ===== */
         .dev-only {
             display: none;
         }
 
         .dev-only.visible {
             display: block;
-        }
-
-        .dev-only-inline {
-            display: none;
-        }
-
-        .dev-only-inline.visible {
-            display: inline-flex;
         }
 
         /* ===== نوافذ تسجيل الدخول ===== */
@@ -602,11 +538,6 @@
             text-align: center;
         }
 
-        .modal-content h2 {
-            color: #4ecdc4;
-            margin-bottom: 20px;
-        }
-
         .modal-content input {
             width: 100%;
             padding: 12px 15px;
@@ -615,11 +546,6 @@
             border-radius: 25px;
             background: #333;
             color: white;
-            font-size: 14px;
-        }
-
-        .modal-content input:focus {
-            outline: 2px solid #4ecdc4;
         }
 
         .modal-buttons {
@@ -635,8 +561,6 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            transition: 0.3s;
         }
 
         .modal-btn.primary {
@@ -644,17 +568,9 @@
             color: white;
         }
 
-        .modal-btn.primary:hover {
-            transform: scale(1.02);
-        }
-
         .modal-btn.secondary {
             background: #333;
             color: white;
-        }
-
-        .modal-btn.secondary:hover {
-            background: #444;
         }
 
         .modal-link {
@@ -663,17 +579,6 @@
             margin-top: 15px;
             display: block;
             font-size: 13px;
-        }
-
-        .modal-link:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
         }
     </style>
 </head>
@@ -690,43 +595,39 @@
         <div class="progress-details" id="progressDetails"></div>
     </div>
 
-    <!-- نافذة تسجيل الدخول -->
+    <!-- نوافذ تسجيل الدخول -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <h2>🔐 تسجيل الدخول</h2>
+            <h2 style="color:#4ecdc4;">🔐 تسجيل الدخول</h2>
             <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
             <input type="password" id="loginPassword" placeholder="كلمة المرور">
-            <div class="error-message" id="loginError"></div>
             <div class="modal-buttons">
                 <button class="modal-btn primary" id="loginSubmit">دخول</button>
                 <button class="modal-btn secondary" id="cancelLogin">إلغاء</button>
             </div>
-            <span class="modal-link" id="showRegisterLink">ليس لديك حساب؟ إنشاء حساب جديد</span>
+            <span class="modal-link" id="showRegisterLink">إنشاء حساب جديد</span>
         </div>
     </div>
 
-    <!-- نافذة إنشاء حساب -->
     <div class="modal" id="registerModal">
         <div class="modal-content">
-            <h2>✨ إنشاء حساب جديد</h2>
+            <h2 style="color:#4ecdc4;">✨ إنشاء حساب</h2>
             <input type="text" id="regName" placeholder="الاسم">
             <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
             <input type="password" id="regPassword" placeholder="كلمة المرور">
             <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
-            <div class="error-message" id="registerError"></div>
             <div class="modal-buttons">
                 <button class="modal-btn primary" id="registerSubmit">تسجيل</button>
                 <button class="modal-btn secondary" id="cancelRegister">إلغاء</button>
             </div>
-            <span class="modal-link" id="showLoginLink">لديك حساب بالفعل؟ تسجيل الدخول</span>
+            <span class="modal-link" id="showLoginLink">تسجيل الدخول</span>
         </div>
     </div>
 
-    <!-- نافذة تأكيد الخروج -->
     <div class="modal" id="exitModal">
         <div class="modal-content">
-            <h3>⚠️ تأكيد الخروج</h3>
-            <p style="color:#888; margin:15px 0;">هل أنت متأكد من الخروج؟</p>
+            <h3 style="color:#ff6b6b;">⚠️ تأكيد الخروج</h3>
+            <p style="color:#888;">هل أنت متأكد؟</p>
             <div class="modal-buttons">
                 <button class="modal-btn primary" id="confirmExit">نعم</button>
                 <button class="modal-btn secondary" id="cancelExit">لا</button>
@@ -735,22 +636,19 @@
     </div>
 
     <div class="container">
-        <!-- الشريط العلوي المتحرك -->
         <div class="animated-header">
-            ✨ حصريات - منصة الفيديو ✨
+            ✨ حصريات - نظام الأزرار الذكية ✨
         </div>
 
-        <!-- شريط التنقل -->
         <div class="navbar">
             <div class="logo">🎬 حصريات</div>
             <div class="user-area">
-                <span class="user-badge" id="userName" onclick="showLoginModal()">تسجيل الدخول</span>
-                <div class="dev-badge" id="devBadge" style="display: none;" onclick="showDeveloperMenu()">⚙️</div>
-                <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="showExitModal()">🚪</button>
+                <span class="user-badge" id="userName">تسجيل الدخول</span>
+                <div class="dev-badge" id="devBadge" style="display: none;">⚙️</div>
+                <button class="logout-btn" id="logoutBtn" style="display: none;">🚪</button>
             </div>
         </div>
 
-        <!-- إحصائيات -->
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-value" id="totalVideos">0</div>
@@ -766,36 +664,29 @@
             </div>
         </div>
 
-        <!-- زر الرفع (للمطور فقط) -->
         <div class="upload-section dev-only" id="uploadSection">
             <button class="upload-btn" id="showUploadBtn">
                 <span>📦</span> رفع مقاطع جديدة
             </button>
         </div>
 
-        <!-- رأس الأزرار -->
         <div class="buttons-header">
             <span class="buttons-title">📌 الأزرار المتاحة</span>
             <span class="total-badge" id="buttonsCount">0 زر</span>
         </div>
 
-        <!-- شبكة الأزرار -->
         <div class="buttons-grid" id="buttonsGrid"></div>
 
-        <!-- صفحة الرفع -->
         <div class="upload-page" id="uploadPage">
             <h2>📦 رفع مقاطع جديدة</h2>
             <label class="file-label" for="fileInput" id="fileLabel">📁</label>
             <input type="file" id="fileInput" accept="video/*" multiple>
-            
             <div class="counter" id="counter">0 مقطع</div>
             <div class="files-list" id="filesList"></div>
-            
             <button class="upload-action-btn" id="uploadBtn" disabled>بدء الرفع</button>
             <div class="back-btn" id="backBtn">← العودة للرئيسية</div>
         </div>
 
-        <!-- صفحة عرض المقاطع -->
         <div class="videos-page" id="videosPage">
             <div class="page-header">
                 <h2 id="pageTitle"></h2>
@@ -806,23 +697,20 @@
     </div>
 
     <script>
-        // ===== إعدادات المطور =====
+        // ===== إعدادات =====
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
-        const DEVELOPER_NAME = 'مدير النظام';
         const VIDEOS_PER_BUTTON = 10;
 
-        // ===== المستخدمين =====
         let users = {
             [DEVELOPER_EMAIL]: {
                 email: DEVELOPER_EMAIL,
-                name: DEVELOPER_NAME,
+                name: 'مدير النظام',
                 password: DEVELOPER_PASSWORD,
                 isDeveloper: true
             }
         };
 
-        // ===== المتغيرات =====
         let currentUser = null;
         let videos = [];
         let selectedFiles = [];
@@ -830,111 +718,17 @@
         // ===== تحميل البيانات =====
         function loadData() {
             const saved = localStorage.getItem('hasryat_videos');
-            if (saved) {
-                try {
-                    videos = JSON.parse(saved);
-                } catch (e) {
-                    videos = [];
-                }
-            }
-            
-            const savedUsers = localStorage.getItem('hasryat_users');
-            if (savedUsers) {
-                try {
-                    users = JSON.parse(savedUsers);
-                    if (!users[DEVELOPER_EMAIL]) {
-                        users[DEVELOPER_EMAIL] = {
-                            email: DEVELOPER_EMAIL,
-                            name: DEVELOPER_NAME,
-                            password: DEVELOPER_PASSWORD,
-                            isDeveloper: true
-                        };
-                    }
-                } catch (e) {}
-            }
-            
+            videos = saved ? JSON.parse(saved) : [];
             updateButtons();
         }
 
         function saveData() {
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
-            localStorage.setItem('hasryat_users', JSON.stringify(users));
             updateButtons();
         }
 
-        // ===== تحديث واجهة المستخدم =====
-        function updateUI() {
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('logoutBtn').style.display = 'block';
-                
-                if (currentUser.isDeveloper) {
-                    document.getElementById('devBadge').style.display = 'flex';
-                    document.querySelectorAll('.dev-only').forEach(el => {
-                        el.classList.add('visible');
-                    });
-                    document.querySelectorAll('.dev-only-inline').forEach(el => {
-                        el.classList.add('visible');
-                    });
-                } else {
-                    document.getElementById('devBadge').style.display = 'none';
-                    document.querySelectorAll('.dev-only').forEach(el => {
-                        el.classList.remove('visible');
-                    });
-                    document.querySelectorAll('.dev-only-inline').forEach(el => {
-                        el.classList.remove('visible');
-                    });
-                }
-            } else {
-                document.getElementById('userName').textContent = 'تسجيل الدخول';
-                document.getElementById('logoutBtn').style.display = 'none';
-                document.getElementById('devBadge').style.display = 'none';
-                document.querySelectorAll('.dev-only').forEach(el => {
-                    el.classList.remove('visible');
-                });
-                document.querySelectorAll('.dev-only-inline').forEach(el => {
-                    el.classList.remove('visible');
-                });
-            }
-        }
-
-        // ===== التحقق من تسجيل الدخول =====
-        function checkLogin() {
-            const saved = localStorage.getItem('hasryat_current_user');
-            if (saved) {
-                try {
-                    const user = JSON.parse(saved);
-                    if (users[user.email]) {
-                        currentUser = users[user.email];
-                        updateUI();
-                    }
-                } catch (e) {}
-            }
-        }
-
-        // ===== نوافذ تسجيل الدخول =====
-        function showLoginModal() {
-            if (!currentUser) {
-                document.getElementById('loginModal').classList.add('active');
-            }
-        }
-
-        function showRegisterModal() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('registerModal').classList.add('active');
-        }
-
-        function showExitModal() {
-            document.getElementById('exitModal').classList.add('active');
-        }
-
-        function showDeveloperMenu() {
-            alert('🔧 قائمة المطور قيد التطوير');
-        }
-
-        // ===== توليد الأزرار =====
+        // ===== تحديث الأزرار =====
         function updateButtons() {
-            const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
             const totalButtons = Math.ceil(totalVideos / VIDEOS_PER_BUTTON);
             
@@ -942,80 +736,53 @@
             document.getElementById('totalButtons').textContent = totalButtons;
             document.getElementById('buttonsCount').textContent = totalButtons + ' زر';
             
-            buttonsGrid.innerHTML = '';
-            
-            if (totalButtons === 0) {
-                buttonsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">📭 لا توجد أزرار بعد</div>';
-                return;
-            }
+            const grid = document.getElementById('buttonsGrid');
+            grid.innerHTML = '';
             
             for (let i = 1; i <= totalButtons; i++) {
                 const start = (i - 1) * VIDEOS_PER_BUTTON + 1;
                 const end = Math.min(i * VIDEOS_PER_BUTTON, totalVideos);
-                const count = end - start + 1;
                 
-                const button = document.createElement('div');
-                button.className = 'page-button';
-                button.onclick = () => showVideosPage(i, start, end);
-                
-                button.innerHTML = `
+                const btn = document.createElement('div');
+                btn.className = 'page-button';
+                btn.onclick = () => showVideos(i, start, end);
+                btn.innerHTML = `
                     <div class="button-number">${i}</div>
                     <div class="button-range">${start} - ${end}</div>
-                    <div class="button-count">${count} مقطع</div>
+                    <div class="button-count">${end-start+1} مقطع</div>
                 `;
-                
-                buttonsGrid.appendChild(button);
+                grid.appendChild(btn);
             }
         }
 
-        // ===== عرض صفحة المقاطع =====
-        function showVideosPage(buttonNum, start, end) {
-            const pageVideos = videos.slice(start - 1, end);
-            const videosGrid = document.getElementById('videosGrid');
-            const pageTitle = document.getElementById('pageTitle');
+        // ===== عرض المقاطع =====
+        function showVideos(btnNum, start, end) {
+            const pageVideos = videos.slice(start-1, end);
+            const grid = document.getElementById('videosGrid');
             
-            pageTitle.textContent = `📄 الزر ${buttonNum} - مقاطع ${start} إلى ${end}`;
-            videosGrid.innerHTML = '';
+            document.getElementById('pageTitle').textContent = `📄 الزر ${btnNum} - مقاطع ${start} إلى ${end}`;
+            grid.innerHTML = '';
             
-            pageVideos.forEach((video, index) => {
-                const videoIndex = start + index;
-                const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
-                
-                const videoCard = document.createElement('div');
-                videoCard.className = 'video-card';
-                
-                let actionsHtml = '';
-                
-                if (currentUser?.isDeveloper) {
-                    actionsHtml = `
-                        <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
-                        <button class="action-btn download-btn" onclick="downloadVideo(${videoIndex - 1})">⬇️ تحميل</button>
-                    `;
-                } else {
-                    actionsHtml = `
-                        <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
-                    `;
-                }
-                
-                videoCard.innerHTML = `
-                    <div class="video-thumb">
-                        🎬
-                        <span class="video-number">#${videoIndex}</span>
-                        ${isDevVideo ? '<span class="dev-badge-small">مطور</span>' : ''}
-                    </div>
-                    <div class="video-info">
-                        <div class="video-name">${video.name || `مقطع ${videoIndex}`}</div>
-                        <div class="video-meta">
-                            <span>${video.size ? (video.size/1024/1024).toFixed(2) + ' MB' : '?? MB'}</span>
-                            <span>${video.date || '06-03'}</span>
+            pageVideos.forEach((v, i) => {
+                const idx = start + i;
+                grid.innerHTML += `
+                    <div class="video-card">
+                        <div class="video-thumb">
+                            🎬
+                            <span class="video-number">#${idx}</span>
                         </div>
-                        <div class="video-actions">
-                            ${actionsHtml}
+                        <div class="video-info">
+                            <div class="video-name">${v.name}</div>
+                            <div class="video-meta">
+                                <span>${(v.size/1024/1024).toFixed(2)} MB</span>
+                            </div>
+                            <div class="video-actions">
+                                <button class="action-btn play-btn" onclick="playVideo(${idx-1})">▶️</button>
+                                ${currentUser?.isDeveloper ? `<button class="action-btn download-btn" onclick="downloadVideo(${idx-1})">⬇️</button>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
-                
-                videosGrid.appendChild(videoCard);
             });
             
             document.querySelector('.buttons-header').style.display = 'none';
@@ -1023,288 +790,143 @@
             document.getElementById('videosPage').classList.add('active');
         }
 
-        // ===== تشغيل الفيديو =====
-        window.playVideo = function(index) {
-            const video = videos[index];
-            if (!video) return;
-            
-            const videoWindow = window.open('', '_blank');
-            videoWindow.document.write(`
-                <html dir="rtl">
-                <head>
-                    <title>${video.name || 'مقطع'}</title>
-                    <style>
-                        body { margin:0; background:#000; display:flex; align-items:center; justify-content:center; height:100vh; }
-                        video { max-width:100%; max-height:100%; }
-                        .back-btn { position:absolute; top:20px; right:20px; color:white; text-decoration:none; background:#333; padding:10px 20px; border-radius:30px; }
-                    </style>
-                </head>
-                <body>
-                    <button class="back-btn" onclick="window.close()">← رجوع</button>
-                    <video controls autoplay>
-                        <source src="${video.url || '#'}" type="video/mp4">
-                    </video>
-                </body>
-                </html>
+        // ===== تشغيل فيديو =====
+        window.playVideo = (i) => {
+            const v = videos[i];
+            if (!v) return;
+            const w = window.open('', '_blank');
+            w.document.write(`
+                <html><body style="margin:0;background:#000">
+                <video src="${v.url}" controls autoplay style="width:100%;height:100vh"></video>
+                </body></html>
             `);
         };
 
-        // ===== تحميل الفيديو (للمطور فقط) =====
-        window.downloadVideo = function(index) {
-            if (!currentUser?.isDeveloper) {
-                alert('❌ التحميل متاح فقط للمطور');
-                return;
-            }
-            
-            const video = videos[index];
-            if (!video) return;
-            
+        window.downloadVideo = (i) => {
+            if (!currentUser?.isDeveloper) return alert('❌ للمطور فقط');
+            const v = videos[i];
             const a = document.createElement('a');
-            a.href = video.url || '#';
-            a.download = video.name || 'video.mp4';
-            document.body.appendChild(a);
+            a.href = v.url;
+            a.download = v.name;
             a.click();
-            document.body.removeChild(a);
         };
 
-        // ===== رفع الملفات =====
-        async function uploadFiles(files) {
-            const progress = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressPercent = document.getElementById('progressPercent');
-            const progressDetails = document.getElementById('progressDetails');
+        // ===== رفع ملفات =====
+        document.getElementById('fileInput').onchange = function(e) {
+            selectedFiles = Array.from(this.files);
+            document.getElementById('counter').textContent = selectedFiles.length + ' مقطع';
+            document.getElementById('uploadBtn').disabled = false;
             
+            const list = document.getElementById('filesList');
+            list.innerHTML = '';
+            selectedFiles.forEach((f, i) => {
+                list.innerHTML += `<div class="file-item">${i+1}. ${f.name} <span>${(f.size/1024/1024).toFixed(2)} MB</span></div>`;
+            });
+        };
+
+        document.getElementById('uploadBtn').onclick = async function() {
+            this.disabled = true;
+            const progress = document.getElementById('uploadProgress');
             progress.style.display = 'block';
             
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const percent = Math.round(((i + 1) / files.length) * 100);
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const f = selectedFiles[i];
+                const p = Math.round(((i+1)/selectedFiles.length)*100);
                 
-                progressFill.style.width = percent + '%';
-                progressPercent.textContent = percent + '%';
-                progressDetails.textContent = `جاري رفع ${file.name} (${i+1}/${files.length})`;
+                document.getElementById('progressFill').style.width = p + '%';
+                document.getElementById('progressPercent').textContent = p + '%';
+                document.getElementById('progressDetails').textContent = `جاري رفع ${f.name} (${i+1}/${selectedFiles.length})`;
                 
                 await new Promise(r => setTimeout(r, 200));
                 
                 const reader = new FileReader();
-                const base64 = await new Promise((resolve) => {
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
+                const base64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(f); });
                 
                 videos.push({
-                    id: Date.now() + i,
-                    name: file.name,
-                    size: file.size,
-                    date: new Date().toLocaleDateString('ar-EG').replace(/\//g, '-'),
-                    url: base64,
-                    uploadedBy: currentUser?.email || 'unknown'
+                    name: f.name,
+                    size: f.size,
+                    url: base64
                 });
             }
             
-            progressFill.style.width = '100%';
-            progressPercent.textContent = '100%';
-            progressDetails.textContent = '✅ تم الرفع بنجاح!';
-            
             saveData();
-            
-            setTimeout(() => {
-                progress.style.display = 'none';
-            }, 1500);
-        }
-
-        // ===== أحداث النوافذ =====
-        document.getElementById('userName').onclick = () => {
-            if (!currentUser) showLoginModal();
+            progress.style.display = 'none';
+            document.getElementById('backBtn').click();
         };
 
-        document.getElementById('showRegisterLink').onclick = (e) => {
-            e.preventDefault();
-            showRegisterModal();
-        };
-
-        document.getElementById('showLoginLink').onclick = (e) => {
-            e.preventDefault();
-            document.getElementById('registerModal').classList.remove('active');
-            document.getElementById('loginModal').classList.add('active');
-        };
-
+        // ===== تسجيل الدخول =====
+        document.getElementById('userName').onclick = () => !currentUser && document.getElementById('loginModal').classList.add('active');
+        document.getElementById('showRegisterLink').onclick = () => { document.getElementById('loginModal').classList.remove('active'); document.getElementById('registerModal').classList.add('active'); };
+        document.getElementById('showLoginLink').onclick = () => { document.getElementById('registerModal').classList.remove('active'); document.getElementById('loginModal').classList.add('active'); };
+        
         document.getElementById('loginSubmit').onclick = () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const error = document.getElementById('loginError');
-            
-            if (!email || !password) {
-                error.textContent = '❌ الرجاء إدخال البريد وكلمة المرور';
-                error.style.display = 'block';
-                return;
-            }
-            
-            if (users[email] && users[email].password === password) {
-                currentUser = users[email];
-                localStorage.setItem('hasryat_current_user', JSON.stringify({ email }));
-                updateUI();
+            const e = document.getElementById('loginEmail').value;
+            const p = document.getElementById('loginPassword').value;
+            if (users[e] && users[e].password === p) {
+                currentUser = users[e];
+                localStorage.setItem('hasryat_user', JSON.stringify({email:e}));
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('logoutBtn').style.display = 'block';
+                if (currentUser.isDeveloper) {
+                    document.getElementById('devBadge').style.display = 'flex';
+                    document.querySelectorAll('.dev-only').forEach(el => el.classList.add('visible'));
+                }
                 document.getElementById('loginModal').classList.remove('active');
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                error.style.display = 'none';
-            } else {
-                error.textContent = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة';
-                error.style.display = 'block';
-            }
+            } else alert('❌ خطأ في البيانات');
         };
 
         document.getElementById('registerSubmit').onclick = () => {
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const confirm = document.getElementById('regConfirm').value;
-            const error = document.getElementById('registerError');
-            
-            if (!name || !email || !password || !confirm) {
-                error.textContent = '❌ الرجاء ملء جميع الحقول';
-                error.style.display = 'block';
-                return;
-            }
-            
-            if (password !== confirm) {
-                error.textContent = '❌ كلمة المرور غير متطابقة';
-                error.style.display = 'block';
-                return;
-            }
-            
-            if (password.length < 6) {
-                error.textContent = '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-                error.style.display = 'block';
-                return;
-            }
-            
-            if (users[email]) {
-                error.textContent = '❌ هذا البريد مسجل بالفعل';
-                error.style.display = 'block';
-                return;
-            }
-            
-            users[email] = {
-                email: email,
-                name: name,
-                password: password,
-                isDeveloper: false
-            };
-            
-            saveData();
-            
+            const n = document.getElementById('regName').value;
+            const e = document.getElementById('regEmail').value;
+            const p = document.getElementById('regPassword').value;
+            const c = document.getElementById('regConfirm').value;
+            if (!n||!e||!p||!c) return alert('❌ املأ كل الحقول');
+            if (p !== c) return alert('❌ كلمة المرور غير متطابقة');
+            if (users[e]) return alert('❌ البريد موجود');
+            users[e] = { email:e, name:n, password:p, isDeveloper:false };
+            localStorage.setItem('hasryat_users', JSON.stringify(users));
+            alert('✅ تم التسجيل');
             document.getElementById('registerModal').classList.remove('active');
-            document.getElementById('regName').value = '';
-            document.getElementById('regEmail').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regConfirm').value = '';
-            error.style.display = 'none';
-            
-            alert('✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن');
         };
 
-        document.getElementById('cancelLogin').onclick = () => {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginError').style.display = 'none';
-        };
-
-        document.getElementById('cancelRegister').onclick = () => {
-            document.getElementById('registerModal').classList.remove('active');
-            document.getElementById('regName').value = '';
-            document.getElementById('regEmail').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regConfirm').value = '';
-            document.getElementById('registerError').style.display = 'none';
-        };
-
+        document.getElementById('logoutBtn').onclick = () => document.getElementById('exitModal').classList.add('active');
         document.getElementById('confirmExit').onclick = () => {
-            localStorage.removeItem('hasryat_current_user');
+            localStorage.removeItem('hasryat_user');
             currentUser = null;
-            updateUI();
+            document.getElementById('userName').textContent = 'تسجيل الدخول';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('devBadge').style.display = 'none';
+            document.querySelectorAll('.dev-only').forEach(el => el.classList.remove('visible'));
             document.getElementById('exitModal').classList.remove('active');
         };
 
-        document.getElementById('cancelExit').onclick = () => {
-            document.getElementById('exitModal').classList.remove('active');
-        };
-
-        // ===== أحداث الرفع =====
+        // ===== أزرار التنقل =====
         document.getElementById('showUploadBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'none';
             document.getElementById('buttonsGrid').style.display = 'none';
             document.getElementById('uploadPage').classList.add('active');
         };
-
         document.getElementById('backBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('uploadPage').classList.remove('active');
-            resetUploadForm();
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filesList').innerHTML = '';
+            document.getElementById('counter').textContent = '0 مقطع';
         };
-
         document.getElementById('closeVideosPage').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('videosPage').classList.remove('active');
         };
 
-        document.getElementById('fileInput').onchange = function(e) {
-            const files = Array.from(this.files);
-            selectedFiles = files;
-            
-            document.getElementById('counter').textContent = files.length + ' مقطع';
-            document.getElementById('uploadBtn').disabled = files.length === 0;
-            
-            const filesList = document.getElementById('filesList');
-            filesList.innerHTML = '';
-            
-            files.forEach((file, i) => {
-                filesList.innerHTML += `
-                    <div class="file-item">
-                        <span>${i+1}. ${file.name}</span>
-                        <span class="size">${(file.size/1024/1024).toFixed(2)} MB</span>
-                    </div>
-                `;
-            });
-        };
+        // ===== إغلاق النوافذ =====
+        document.getElementById('cancelLogin').onclick = () => document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('cancelRegister').onclick = () => document.getElementById('registerModal').classList.remove('active');
+        document.getElementById('cancelExit').onclick = () => document.getElementById('exitModal').classList.remove('active');
+        window.onclick = (e) => { if (e.target.classList.contains('modal')) e.target.classList.remove('active'); };
 
-        document.getElementById('uploadBtn').onclick = async function() {
-            if (selectedFiles.length === 0) return;
-            
-            this.disabled = true;
-            await uploadFiles(selectedFiles);
-            
-            document.querySelector('.buttons-header').style.display = 'flex';
-            document.getElementById('buttonsGrid').style.display = 'grid';
-            document.getElementById('uploadPage').classList.remove('active');
-            resetUploadForm();
-        };
-
-        function resetUploadForm() {
-            document.getElementById('fileInput').value = '';
-            document.getElementById('counter').textContent = '0 مقطع';
-            document.getElementById('filesList').innerHTML = '';
-            document.getElementById('uploadBtn').disabled = true;
-            selectedFiles = [];
-        }
-
-        // ===== إغلاق النوافذ عند الضغط خارجها =====
-        window.onclick = (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
-            }
-        };
-
-        // ===== منع النسخ =====
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('copy', e => e.preventDefault());
-
-        // ===== بدء التشغيل =====
         loadData();
-        checkLogin();
     </script>
 </body>
 </html>
