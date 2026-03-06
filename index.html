@@ -56,6 +56,11 @@
             border-radius: 25px;
             color: #4ecdc4;
             font-size: 14px;
+            cursor: pointer;
+        }
+
+        .user-badge:hover {
+            background: #444;
         }
 
         .dev-badge {
@@ -570,7 +575,7 @@
             display: inline-flex;
         }
 
-        /* ===== نافذة الخروج ===== */
+        /* ===== نوافذ تسجيل الدخول ===== */
         .modal {
             display: none;
             position: fixed;
@@ -592,24 +597,35 @@
             background: #1a1a1a;
             border-radius: 30px;
             padding: 30px;
-            max-width: 300px;
+            max-width: 350px;
             width: 90%;
             text-align: center;
         }
 
-        .modal-content h3 {
-            color: white;
-            margin-bottom: 15px;
+        .modal-content h2 {
+            color: #4ecdc4;
+            margin-bottom: 20px;
         }
 
-        .modal-content p {
-            color: #888;
-            margin-bottom: 25px;
+        .modal-content input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 25px;
+            background: #333;
+            color: white;
+            font-size: 14px;
+        }
+
+        .modal-content input:focus {
+            outline: 2px solid #4ecdc4;
         }
 
         .modal-buttons {
             display: flex;
             gap: 10px;
+            margin-top: 20px;
         }
 
         .modal-btn {
@@ -619,16 +635,45 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
-        .modal-btn.yes {
-            background: #ff4757;
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
             color: white;
         }
 
-        .modal-btn.no {
+        .modal-btn.primary:hover {
+            transform: scale(1.02);
+        }
+
+        .modal-btn.secondary {
             background: #333;
             color: white;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #444;
+        }
+
+        .modal-link {
+            color: #4ecdc4;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            font-size: 13px;
+        }
+
+        .modal-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -645,27 +690,46 @@
         <div class="progress-details" id="progressDetails"></div>
     </div>
 
-    <!-- نافذة الخروج -->
-    <div class="modal" id="exitModal">
-        <div class="modal-content">
-            <h3>⚠️ تأكيد الخروج</h3>
-            <p>هل أنت متأكد من الخروج؟</p>
-            <div class="modal-buttons">
-                <button class="modal-btn yes" id="confirmExit">نعم</button>
-                <button class="modal-btn no" id="cancelExit">لا</button>
-            </div>
-        </div>
-    </div>
-
     <!-- نافذة تسجيل الدخول -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <h3>🔐 تسجيل الدخول</h3>
-            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%; padding:12px; margin:10px 0; border-radius:25px; border:none; background:#333; color:white;">
-            <input type="password" id="loginPassword" placeholder="كلمة المرور" style="width:100%; padding:12px; margin:10px 0; border-radius:25px; border:none; background:#333; color:white;">
-            <div class="modal-buttons" style="margin-top:20px;">
-                <button class="modal-btn yes" id="loginSubmit">دخول</button>
-                <button class="modal-btn no" id="cancelLogin">إلغاء</button>
+            <h2>🔐 تسجيل الدخول</h2>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور">
+            <div class="error-message" id="loginError"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="loginSubmit">دخول</button>
+                <button class="modal-btn secondary" id="cancelLogin">إلغاء</button>
+            </div>
+            <span class="modal-link" id="showRegisterLink">ليس لديك حساب؟ إنشاء حساب جديد</span>
+        </div>
+    </div>
+
+    <!-- نافذة إنشاء حساب -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <h2>✨ إنشاء حساب جديد</h2>
+            <input type="text" id="regName" placeholder="الاسم">
+            <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="regPassword" placeholder="كلمة المرور">
+            <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
+            <div class="error-message" id="registerError"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="registerSubmit">تسجيل</button>
+                <button class="modal-btn secondary" id="cancelRegister">إلغاء</button>
+            </div>
+            <span class="modal-link" id="showLoginLink">لديك حساب بالفعل؟ تسجيل الدخول</span>
+        </div>
+    </div>
+
+    <!-- نافذة تأكيد الخروج -->
+    <div class="modal" id="exitModal">
+        <div class="modal-content">
+            <h3>⚠️ تأكيد الخروج</h3>
+            <p style="color:#888; margin:15px 0;">هل أنت متأكد من الخروج؟</p>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="confirmExit">نعم</button>
+                <button class="modal-btn secondary" id="cancelExit">لا</button>
             </div>
         </div>
     </div>
@@ -680,9 +744,9 @@
         <div class="navbar">
             <div class="logo">🎬 حصريات</div>
             <div class="user-area">
-                <span class="user-badge" id="userName">زائر</span>
-                <div class="dev-badge" id="devBadge" style="display: none;">⚙️</div>
-                <button class="logout-btn" id="logoutBtn">🚪</button>
+                <span class="user-badge" id="userName" onclick="showLoginModal()">تسجيل الدخول</span>
+                <div class="dev-badge" id="devBadge" style="display: none;" onclick="showDeveloperMenu()">⚙️</div>
+                <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="showExitModal()">🚪</button>
             </div>
         </div>
 
@@ -742,16 +806,17 @@
     </div>
 
     <script>
-        // ===== إعدادات =====
+        // ===== إعدادات المطور =====
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
+        const DEVELOPER_NAME = 'مدير النظام';
         const VIDEOS_PER_BUTTON = 10;
 
         // ===== المستخدمين =====
         let users = {
             [DEVELOPER_EMAIL]: {
                 email: DEVELOPER_EMAIL,
-                name: 'مدير النظام',
+                name: DEVELOPER_NAME,
                 password: DEVELOPER_PASSWORD,
                 isDeveloper: true
             }
@@ -772,11 +837,28 @@
                     videos = [];
                 }
             }
+            
+            const savedUsers = localStorage.getItem('hasryat_users');
+            if (savedUsers) {
+                try {
+                    users = JSON.parse(savedUsers);
+                    if (!users[DEVELOPER_EMAIL]) {
+                        users[DEVELOPER_EMAIL] = {
+                            email: DEVELOPER_EMAIL,
+                            name: DEVELOPER_NAME,
+                            password: DEVELOPER_PASSWORD,
+                            isDeveloper: true
+                        };
+                    }
+                } catch (e) {}
+            }
+            
             updateButtons();
         }
 
         function saveData() {
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
+            localStorage.setItem('hasryat_users', JSON.stringify(users));
             updateButtons();
         }
 
@@ -784,6 +866,7 @@
         function updateUI() {
             if (currentUser) {
                 document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('logoutBtn').style.display = 'block';
                 
                 if (currentUser.isDeveloper) {
                     document.getElementById('devBadge').style.display = 'flex';
@@ -803,7 +886,8 @@
                     });
                 }
             } else {
-                document.getElementById('userName').textContent = 'زائر';
+                document.getElementById('userName').textContent = 'تسجيل الدخول';
+                document.getElementById('logoutBtn').style.display = 'none';
                 document.getElementById('devBadge').style.display = 'none';
                 document.querySelectorAll('.dev-only').forEach(el => {
                     el.classList.remove('visible');
@@ -826,6 +910,26 @@
                     }
                 } catch (e) {}
             }
+        }
+
+        // ===== نوافذ تسجيل الدخول =====
+        function showLoginModal() {
+            if (!currentUser) {
+                document.getElementById('loginModal').classList.add('active');
+            }
+        }
+
+        function showRegisterModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function showExitModal() {
+            document.getElementById('exitModal').classList.add('active');
+        }
+
+        function showDeveloperMenu() {
+            alert('🔧 قائمة المطور قيد التطوير');
         }
 
         // ===== توليد الأزرار =====
@@ -883,13 +987,11 @@
                 let actionsHtml = '';
                 
                 if (currentUser?.isDeveloper) {
-                    // للمطور: يشوف زر التشغيل والتحميل
                     actionsHtml = `
                         <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
                         <button class="action-btn download-btn" onclick="downloadVideo(${videoIndex - 1})">⬇️ تحميل</button>
                     `;
                 } else {
-                    // للمستخدم العادي: يشوف زر التشغيل فقط (بدون تحميل)
                     actionsHtml = `
                         <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
                     `;
@@ -957,8 +1059,12 @@
             const video = videos[index];
             if (!video) return;
             
-            alert(`جاري تحميل: ${video.name || 'مقطع'}`);
-            // هنا كود التحميل الفعلي
+            const a = document.createElement('a');
+            a.href = video.url || '#';
+            a.download = video.name || 'video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         };
 
         // ===== رفع الملفات =====
@@ -980,7 +1086,6 @@
                 
                 await new Promise(r => setTimeout(r, 200));
                 
-                // تحويل الملف إلى Base64
                 const reader = new FileReader();
                 const base64 = await new Promise((resolve) => {
                     reader.onload = () => resolve(reader.result);
@@ -1008,27 +1113,145 @@
             }, 1500);
         }
 
-        // ===== أحداث =====
-        document.getElementById('showUploadBtn')?.addEventListener('click', () => {
+        // ===== أحداث النوافذ =====
+        document.getElementById('userName').onclick = () => {
+            if (!currentUser) showLoginModal();
+        };
+
+        document.getElementById('showRegisterLink').onclick = (e) => {
+            e.preventDefault();
+            showRegisterModal();
+        };
+
+        document.getElementById('showLoginLink').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('registerModal').classList.remove('active');
+            document.getElementById('loginModal').classList.add('active');
+        };
+
+        document.getElementById('loginSubmit').onclick = () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const error = document.getElementById('loginError');
+            
+            if (!email || !password) {
+                error.textContent = '❌ الرجاء إدخال البريد وكلمة المرور';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (users[email] && users[email].password === password) {
+                currentUser = users[email];
+                localStorage.setItem('hasryat_current_user', JSON.stringify({ email }));
+                updateUI();
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                error.style.display = 'none';
+            } else {
+                error.textContent = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة';
+                error.style.display = 'block';
+            }
+        };
+
+        document.getElementById('registerSubmit').onclick = () => {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            const error = document.getElementById('registerError');
+            
+            if (!name || !email || !password || !confirm) {
+                error.textContent = '❌ الرجاء ملء جميع الحقول';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirm) {
+                error.textContent = '❌ كلمة المرور غير متطابقة';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                error.textContent = '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (users[email]) {
+                error.textContent = '❌ هذا البريد مسجل بالفعل';
+                error.style.display = 'block';
+                return;
+            }
+            
+            users[email] = {
+                email: email,
+                name: name,
+                password: password,
+                isDeveloper: false
+            };
+            
+            saveData();
+            
+            document.getElementById('registerModal').classList.remove('active');
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirm').value = '';
+            error.style.display = 'none';
+            
+            alert('✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن');
+        };
+
+        document.getElementById('cancelLogin').onclick = () => {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        };
+
+        document.getElementById('cancelRegister').onclick = () => {
+            document.getElementById('registerModal').classList.remove('active');
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirm').value = '';
+            document.getElementById('registerError').style.display = 'none';
+        };
+
+        document.getElementById('confirmExit').onclick = () => {
+            localStorage.removeItem('hasryat_current_user');
+            currentUser = null;
+            updateUI();
+            document.getElementById('exitModal').classList.remove('active');
+        };
+
+        document.getElementById('cancelExit').onclick = () => {
+            document.getElementById('exitModal').classList.remove('active');
+        };
+
+        // ===== أحداث الرفع =====
+        document.getElementById('showUploadBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'none';
             document.getElementById('buttonsGrid').style.display = 'none';
             document.getElementById('uploadPage').classList.add('active');
-        });
+        };
 
-        document.getElementById('backBtn')?.addEventListener('click', () => {
+        document.getElementById('backBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('uploadPage').classList.remove('active');
             resetUploadForm();
-        });
+        };
 
-        document.getElementById('closeVideosPage')?.addEventListener('click', () => {
+        document.getElementById('closeVideosPage').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('videosPage').classList.remove('active');
-        });
+        };
 
-        document.getElementById('fileInput')?.addEventListener('change', function(e) {
+        document.getElementById('fileInput').onchange = function(e) {
             const files = Array.from(this.files);
             selectedFiles = files;
             
@@ -1046,9 +1269,9 @@
                     </div>
                 `;
             });
-        });
+        };
 
-        document.getElementById('uploadBtn')?.addEventListener('click', async function() {
+        document.getElementById('uploadBtn').onclick = async function() {
             if (selectedFiles.length === 0) return;
             
             this.disabled = true;
@@ -1058,7 +1281,7 @@
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('uploadPage').classList.remove('active');
             resetUploadForm();
-        });
+        };
 
         function resetUploadForm() {
             document.getElementById('fileInput').value = '';
@@ -1068,57 +1291,16 @@
             selectedFiles = [];
         }
 
-        // ===== أحداث تسجيل الدخول =====
-        document.getElementById('devBadge')?.addEventListener('click', () => {
-            document.getElementById('loginModal').classList.add('active');
-        });
-
-        document.getElementById('loginSubmit')?.addEventListener('click', () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (users[email] && users[email].password === password) {
-                currentUser = users[email];
-                localStorage.setItem('hasryat_current_user', JSON.stringify({ email }));
-                updateUI();
-                document.getElementById('loginModal').classList.remove('active');
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                alert('✅ تم تسجيل الدخول بنجاح');
-            } else {
-                alert('❌ خطأ في البريد أو كلمة المرور');
+        // ===== إغلاق النوافذ عند الضغط خارجها =====
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
             }
-        });
+        };
 
-        document.getElementById('cancelLogin')?.addEventListener('click', () => {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-        });
-
-        document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            document.getElementById('exitModal').classList.add('active');
-        });
-
-        document.getElementById('confirmExit')?.addEventListener('click', () => {
-            localStorage.removeItem('hasryat_current_user');
-            currentUser = null;
-            updateUI();
-            document.getElementById('exitModal').classList.remove('active');
-        });
-
-        document.getElementById('cancelExit')?.addEventListener('click', () => {
-            document.getElementById('exitModal').classList.remove('active');
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('exitModal')) {
-                document.getElementById('exitModal').classList.remove('active');
-            }
-            if (e.target === document.getElementById('loginModal')) {
-                document.getElementById('loginModal').classList.remove('active');
-            }
-        });
+        // ===== منع النسخ =====
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
 
         // ===== بدء التشغيل =====
         loadData();
