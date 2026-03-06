@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - مقاطع المطور للجميع</title>
+    <title>حصريات - رفع خلفي سريع</title>
     <style>
         * {
             margin: 0;
@@ -1146,19 +1146,54 @@
             border-radius: 10px;
             margin-left: 5px;
         }
+        
+        /* مؤشر الرفع في الخلفية */
+        .background-upload-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 2px solid #4ecdc4;
+            border-radius: 30px;
+            padding: 15px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        
+        .upload-speed {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - مقاطع المطور للجميع ✨
+        ✨ حصريات - رفع في الخلفية (ما يعلق) ✨
+    </div>
+
+    <!-- مؤشر الرفع في الخلفية -->
+    <div class="background-upload-indicator" id="uploadIndicator">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: white;">⚡ جاري الرفع في الخلفية</span>
+            <span style="color: #4ecdc4;" id="indicatorProgress">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="indicatorBar" style="width: 0%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #888; font-size: 12px;">
+            <span id="indicatorCount">0/0</span>
+            <span class="upload-speed" id="indicatorSpeed">🚀</span>
+        </div>
     </div>
 
     <!-- صفحة تسجيل الدخول -->
     <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-header">
-                <h1>🎬</h1>
-                <p>حصريات - تسجيل الدخول</p>
+                <h1>🚀</h1>
+                <p>حصريات - رفع خلفي سريع</p>
             </div>
             
             <form id="loginForm">
@@ -1215,7 +1250,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
-                <span class="clean-badge" id="cleanBadge">👥 للجميع</span>
+                <span class="clean-badge" id="cleanBadge">⚡ خلفي</span>
                 <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
@@ -1252,7 +1287,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك
+            ✅ مرحباً بك - الرفع في الخلفية
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1275,7 +1310,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (للمطور)
+                    <span>📦</span> رفع مقاطع (خلفي - ما يعلق)
                 </button>
             </div>
 
@@ -1326,7 +1361,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع مقاطع <span class="warning-badge">تظهر للجميع</span></h2>
+            <h2>📦 رفع خلفي <span class="warning-badge">ما يعلق</span></h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1346,7 +1381,7 @@
                     <div style="color:#888; font-size:12px; margin-top:10px;" id="progressDetails"></div>
                 </div>
                 
-                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>رفع وحفظ المقاطع</button>
+                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>بدء الرفع في الخلفية</button>
                 <div class="back-btn" id="backToMainBtn">← العودة للرئيسية</div>
             </div>
         </div>
@@ -1424,10 +1459,13 @@
                 localStorage.removeItem('hasryat_current_user_new');
                 localStorage.removeItem('hasryat_users_final');
                 localStorage.removeItem('hasryat_current_user_final');
+                localStorage.removeItem('hasryat_users_public');
+                localStorage.removeItem('hasryat_current_user_public');
                 
                 const request = indexedDB.deleteDatabase('HasryatVideosDB');
                 const request2 = indexedDB.deleteDatabase('HasryatVideosDB_New');
                 const request3 = indexedDB.deleteDatabase('HasryatVideosDB_Final');
+                const request4 = indexedDB.deleteDatabase('HasryatVideosDB_Public');
                 
                 console.log('✅ تم تنظيف التخزين القديم');
             } catch (e) {
@@ -1457,15 +1495,19 @@
         let selectedFiles = [];
         let currentUser = null;
         let selectedForPublish = new Set();
+        let isUploading = false;
+        let uploadStartTime = null;
+        let uploadCompleted = 0;
+        let uploadTotal = 0;
         
         // ========== IndexedDB جديد ==========
-        const DB_NAME = 'HasryatVideosDB_Public';
+        const DB_NAME = 'HasryatVideosDB_Fast';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
 
-        // إعدادات الرفع
-        const BATCH_SIZE = 5;
-        const MAX_CONCURRENT = 3;
+        // إعدادات الرفع السريع
+        const BATCH_SIZE = 10; // 10 مقاطع كل مرة (أسرع)
+        const MAX_CONCURRENT = 5; // 5 مقاطع متوازية (أسرع)
 
         // فتح قاعدة البيانات
         function openDB() {
@@ -1528,7 +1570,7 @@
             }
         }
 
-        // حفظ مجموعة فيديوهات
+        // حفظ مجموعة فيديوهات (بسرعة)
         async function saveVideoBatch(videosBatch) {
             if (!videosBatch || videosBatch.length === 0) return;
             
@@ -1598,12 +1640,12 @@
 
         // حفظ المستخدمين
         function saveUsers() {
-            localStorage.setItem('hasryat_users_public', JSON.stringify(users));
+            localStorage.setItem('hasryat_users_fast', JSON.stringify(users));
         }
 
         // تحميل المستخدمين
         function loadUsers() {
-            const savedUsers = localStorage.getItem('hasryat_users_public');
+            const savedUsers = localStorage.getItem('hasryat_users_fast');
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
@@ -1624,7 +1666,7 @@
             saveUsers();
         }
 
-        // ========== تحويل الملف إلى Base64 ==========
+        // ========== تحويل الملف إلى Base64 (بسرعة) ==========
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1635,28 +1677,31 @@
                     reject(new Error('فشل قراءة الملف: ' + file.name));
                 };
                 
+                // مهلة زمنية 60 ثانية
                 const timeout = setTimeout(() => {
                     if (reader.readyState !== 2) {
                         reader.abort();
                         reject(new Error('تجاوز الوقت للملف: ' + file.name));
                     }
-                }, 30000);
+                }, 60000);
                 
                 reader.onloadend = () => clearTimeout(timeout);
             });
         }
 
-        // ========== رفع ذكي ==========
-        async function uploadFilesSmart(files, progressCallback) {
+        // ========== رفع سريع في الخلفية ==========
+        async function uploadFilesInBackground(files, progressCallback) {
             const results = [];
             const total = files.length;
             let completed = 0;
             let failedCount = 0;
             
+            // تقسيم الملفات إلى دفعات
             for (let i = 0; i < files.length; i += BATCH_SIZE) {
                 const batch = files.slice(i, i + BATCH_SIZE);
                 const batchPromises = [];
                 
+                // معالجة الدفعة بالتوازي
                 for (const file of batch) {
                     const promise = (async () => {
                         try {
@@ -1675,16 +1720,22 @@
                                 type: file.type || 'video/mp4',
                                 uploadedBy: currentUser ? currentUser.email : 'unknown',
                                 uploadedAt: new Date().toISOString(),
-                                isPublic: true // كل مقاطع المطور تكون عامة
+                                isPublic: true
                             };
                             
                             completed++;
+                            
+                            // حساب السرعة
+                            const elapsedSeconds = (Date.now() - uploadStartTime) / 1000;
+                            const speed = (completed / elapsedSeconds).toFixed(1);
+                            
                             progressCallback({
                                 completed,
                                 total,
                                 fileName: file.name,
                                 success: true,
-                                failed: failedCount
+                                failed: failedCount,
+                                speed: speed
                             });
                             
                             return videoData;
@@ -1706,6 +1757,7 @@
                     
                     batchPromises.push(promise);
                     
+                    // تشغيل متوازي
                     if (batchPromises.length >= MAX_CONCURRENT) {
                         const batchResults = await Promise.all(batchPromises);
                         const validResults = batchResults.filter(r => r !== null);
@@ -1716,10 +1768,11 @@
                         }
                         
                         batchPromises.length = 0;
-                        await new Promise(r => setTimeout(r, 50));
+                        await new Promise(r => setTimeout(r, 10)); // وقفة صغيرة
                     }
                 }
                 
+                // انتظار باقي المقاطع
                 if (batchPromises.length > 0) {
                     const batchResults = await Promise.all(batchPromises);
                     const validResults = batchResults.filter(r => r !== null);
@@ -1859,6 +1912,12 @@
         const cancelExit = document.getElementById('cancelExit');
         
         const clearAllBtn = document.getElementById('clearAllBtn');
+        
+        const uploadIndicator = document.getElementById('uploadIndicator');
+        const indicatorProgress = document.getElementById('indicatorProgress');
+        const indicatorBar = document.getElementById('indicatorBar');
+        const indicatorCount = document.getElementById('indicatorCount');
+        const indicatorSpeed = document.getElementById('indicatorSpeed');
 
         // ========== تبديل بين الصفحات ==========
         showRegisterBtn.addEventListener('click', () => {
@@ -1928,7 +1987,7 @@
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
-            const savedUser = localStorage.getItem('hasryat_current_user_public');
+            const savedUser = localStorage.getItem('hasryat_current_user_fast');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
@@ -1936,10 +1995,10 @@
                         currentUser = users[user.email];
                         showMainApp(currentUser);
                     } else {
-                        localStorage.removeItem('hasryat_current_user_public');
+                        localStorage.removeItem('hasryat_current_user_fast');
                     }
                 } catch (e) {
-                    localStorage.removeItem('hasryat_current_user_public');
+                    localStorage.removeItem('hasryat_current_user_fast');
                 }
             }
         }
@@ -1984,15 +2043,10 @@
                 }
             }
             
-            // تحميل كل الفيديوهات
             const allVideos = await loadVideos();
-            
-            // المستخدم يشوف:
-            // 1. فيديوهاته الخاصة
-            // 2. فيديوهات المطور (لأن isPublic = true)
             videos = allVideos.filter(v => 
-                v.uploadedBy === user.email || // فيديوهاته
-                v.isPublic === true // فيديوهات عامة (المطور)
+                v.uploadedBy === user.email || 
+                v.isPublic === true
             );
             
             renderVideos();
@@ -2025,7 +2079,7 @@
                 currentUser = user;
                 
                 if (rememberMe.checked) {
-                    localStorage.setItem('hasryat_current_user_public', JSON.stringify({ email: user.email }));
+                    localStorage.setItem('hasryat_current_user_fast', JSON.stringify({ email: user.email }));
                 }
                 
                 showMainApp(user);
@@ -2129,13 +2183,11 @@
                 const videoCard = document.createElement('div');
                 videoCard.className = 'video-card';
                 
-                // علامة إذا كان المقطع من المطور
                 const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
                 
                 let actionsHtml = '';
                 
                 if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
-                    // للمطور أو صاحب المقطع: كل الصلاحيات
                     actionsHtml = `
                         <div class="video-actions">
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
@@ -2144,7 +2196,6 @@
                         </div>
                     `;
                 } else {
-                    // للمستخدم العادي: تشغيل فقط
                     actionsHtml = `
                         <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                     `;
@@ -2215,7 +2266,6 @@
             if (confirm('هل أنت متأكد من حذف هذا المقطع؟')) {
                 await deleteVideoFromDB(id);
                 
-                // تحديث قائمة الفيديوهات
                 const allVideos = await loadVideos();
                 videos = allVideos.filter(v => 
                     v.uploadedBy === currentUser.email || 
@@ -2382,7 +2432,7 @@
             });
         }
 
-        // ========== رفع الملفات ==========
+        // ========== رفع الملفات في الخلفية ==========
         function resetUploadForm() {
             selectedFiles = [];
             if (fileInput) fileInput.value = '';
@@ -2461,10 +2511,17 @@
                 
                 if (selectedFiles.length === 0) return;
                 
+                // منع الضغط على الزر مرة ثانية
                 uploadSubmitBtn.disabled = true;
                 fileInput.disabled = true;
-                batchProgress.style.display = 'block';
                 
+                // إظهار مؤشر الرفع في الخلفية
+                uploadIndicator.style.display = 'block';
+                uploadStartTime = Date.now();
+                uploadTotal = selectedFiles.length;
+                uploadCompleted = 0;
+                
+                // تحديث حالة الملفات
                 for (let i = 0; i < Math.min(selectedFiles.length, 30); i++) {
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
@@ -2474,16 +2531,19 @@
                 }
                 
                 try {
-                    const startTime = Date.now();
-                    
-                    const { results, failed } = await uploadFilesSmart(selectedFiles, (data) => {
+                    // بدء الرفع في الخلفية (بدون انتظار)
+                    uploadFilesInBackground(selectedFiles, (data) => {
+                        // تحديث المؤشر العام
                         const percentage = Math.round((data.completed / data.total) * 100);
-                        progressFill.style.width = percentage + '%';
-                        progressText.innerHTML = `جاري الرفع: ${data.completed} من ${data.total}`;
+                        indicatorBar.style.width = percentage + '%';
+                        indicatorProgress.textContent = percentage + '%';
+                        indicatorCount.textContent = `${data.completed}/${data.total}`;
                         
-                        const successCount = data.completed - data.failed;
-                        progressDetails.innerHTML = `✅ نجح: ${successCount} | ❌ فشل: ${data.failed}`;
+                        if (data.speed) {
+                            indicatorSpeed.textContent = `🚀 ${data.speed} مقطع/ث`;
+                        }
                         
+                        // تحديث الملفات المعروضة
                         if (data.fileName) {
                             const fileIndex = selectedFiles.findIndex(f => f.name === data.fileName);
                             if (fileIndex >= 0 && fileIndex < 30) {
@@ -2499,45 +2559,45 @@
                                 }
                             }
                         }
-                    });
-                    
-                    // تحميل كل الفيديوهات المرفوعة
-                    const allVideos = await loadVideos();
-                    videos = allVideos.filter(v => 
-                        v.uploadedBy === currentUser.email || 
-                        v.isPublic === true
-                    );
-                    
-                    renderVideos();
-                    updateStorageInfo();
-                    
-                    const endTime = Date.now();
-                    const timeSeconds = ((endTime - startTime) / 1000).toFixed(1);
-                    
-                    progressText.innerHTML = `✅ اكتمل! تم رفع ${results.length} مقطع بنجاح في ${timeSeconds} ثانية`;
-                    if (failed > 0) {
-                        progressDetails.innerHTML += `<br>❌ فشل ${failed} مقطع`;
-                    }
-                    
-                    showSaveBadge('تم الرفع');
-                    
-                    setTimeout(() => {
-                        mainPage.classList.add('active');
-                        uploadPage.classList.remove('active');
-                        resetUploadForm();
-                        fileInput.disabled = false;
                         
-                        welcomeAlert.style.display = 'block';
-                        welcomeAlert.innerHTML = `✅ تم رفع ${results.length} مقاطع! ${failed > 0 ? `(${failed} فشل)` : ''}`;
-                        setTimeout(() => {
-                            welcomeAlert.style.display = 'none';
-                        }, 3000);
-                    }, 1500);
+                        // إذا اكتمل الرفع
+                        if (data.completed === data.total) {
+                            setTimeout(async () => {
+                                // تحديث الفيديوهات
+                                const allVideos = await loadVideos();
+                                videos = allVideos.filter(v => 
+                                    v.uploadedBy === currentUser.email || 
+                                    v.isPublic === true
+                                );
+                                
+                                renderVideos();
+                                updateStorageInfo();
+                                
+                                // إخفاء المؤشر بعد ثانيتين
+                                setTimeout(() => {
+                                    uploadIndicator.style.display = 'none';
+                                }, 2000);
+                                
+                                // العودة للصفحة الرئيسية
+                                mainPage.classList.add('active');
+                                uploadPage.classList.remove('active');
+                                resetUploadForm();
+                                fileInput.disabled = false;
+                                
+                                welcomeAlert.style.display = 'block';
+                                welcomeAlert.innerHTML = `✅ تم رفع ${data.completed - data.failed} مقاطع في الخلفية!`;
+                                setTimeout(() => {
+                                    welcomeAlert.style.display = 'none';
+                                }, 3000);
+                            }, 500);
+                        }
+                    });
                     
                 } catch (error) {
                     alert('خطأ في رفع الملف: ' + error.message);
                     resetUploadForm();
                     fileInput.disabled = false;
+                    uploadIndicator.style.display = 'none';
                 }
             });
         }
@@ -2633,12 +2693,15 @@
 
         if (confirmExit) {
             confirmExit.addEventListener('click', () => {
-                localStorage.removeItem('hasryat_current_user_public');
+                localStorage.removeItem('hasryat_current_user_fast');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
                 mainApp.style.display = 'none';
                 loginPage.style.display = 'flex';
-                exitModal.classList.remove('active');
+                exitModal.classList.add('active'); // تعديل: إظهار نافذة الخروج
+                setTimeout(() => {
+                    exitModal.classList.remove('active');
+                }, 100);
             });
         }
 
