@@ -159,6 +159,41 @@
             box-shadow: 0 10px 20px rgba(255,107,107,0.3);
         }
 
+        .dev-actions {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .dev-action-btn {
+            flex: 1;
+            padding: 15px;
+            background: #333;
+            border: 1px solid #ff6b6b;
+            border-radius: 30px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .dev-action-btn:hover {
+            background: #ff6b6b;
+            border-color: #4ecdc4;
+        }
+
+        .dev-action-btn.danger {
+            border-color: #ff4757;
+        }
+
+        .dev-action-btn.danger:hover {
+            background: #ff4757;
+        }
+
         .buttons-header {
             display: flex;
             justify-content: space-between;
@@ -561,6 +596,11 @@
             color: white;
         }
 
+        .modal-btn.danger {
+            background: #ff4757;
+            color: white;
+        }
+
         .modal-link {
             color: #4ecdc4;
             cursor: pointer;
@@ -615,6 +655,18 @@
         </div>
     </div>
 
+    <!-- نافذة تأكيد حذف الكل -->
+    <div class="modal" id="deleteAllModal">
+        <div class="modal-content">
+            <h3 style="color:#ff6b6b;">⚠️ حذف جميع المقاطع</h3>
+            <p style="color:#888; margin:15px 0;">هل أنت متأكد؟ لا يمكن التراجع!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn danger" id="confirmDeleteAll">حذف الكل</button>
+                <button class="modal-btn secondary" id="cancelDeleteAll">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="exitModal">
         <div class="modal-content">
             <h3 style="color:#ff6b6b;">⚠️ تأكيد الخروج</h3>
@@ -653,6 +705,16 @@
                 <div class="stat-value">10</div>
                 <div class="stat-label">مقطع/زر</div>
             </div>
+        </div>
+
+        <!-- أزرار المطور -->
+        <div class="dev-actions dev-only" id="devActions">
+            <button class="dev-action-btn" id="refreshBtn">
+                <span>🔄</span> تحديث الأزرار
+            </button>
+            <button class="dev-action-btn danger" id="deleteAllBtn">
+                <span>🗑️</span> حذف جميع المقاطع
+            </button>
         </div>
 
         <div class="upload-section dev-only" id="uploadSection">
@@ -706,6 +768,7 @@
         let videos = [];
         let selectedFiles = [];
 
+        // ===== تحميل البيانات =====
         function loadData() {
             const savedUsers = localStorage.getItem('hasryat_users');
             if (savedUsers) {
@@ -727,9 +790,12 @@
             if (savedVideos) {
                 try {
                     videos = JSON.parse(savedVideos);
+                    console.log('✅ تم تحميل المقاطع:', videos.length);
                 } catch (e) {
                     videos = [];
                 }
+            } else {
+                videos = [];
             }
             
             const savedUser = localStorage.getItem('hasryat_current_user');
@@ -750,12 +816,14 @@
             }
             
             updateUI();
-            updateButtons();
+            updateButtons(); // تأكيد تحديث الأزرار
         }
 
         function saveData() {
             localStorage.setItem('hasryat_users', JSON.stringify(users));
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
+            console.log('✅ تم حفظ المقاطع:', videos.length);
+            updateButtons(); // تحديث الأزرار بعد الحفظ
         }
 
         function updateUI() {
@@ -784,7 +852,7 @@
             }
         }
 
-        // ===== هنا المشكلة كانت - عدلنا دالة عرض الأزرار =====
+        // ===== تحديث الأزرار =====
         function updateButtons() {
             const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
@@ -801,7 +869,6 @@
                 return;
             }
             
-            // عرض الأزرار بشكل صحيح
             for (let i = 1; i <= totalButtons; i++) {
                 const start = (i - 1) * VIDEOS_PER_BUTTON + 1;
                 const end = Math.min(i * VIDEOS_PER_BUTTON, totalVideos);
@@ -817,6 +884,8 @@
                 `;
                 buttonsGrid.appendChild(button);
             }
+            
+            console.log('✅ تم تحديث الأزرار:', totalButtons);
         }
 
         function showVideosPage(btnNum, start, end) {
@@ -878,6 +947,7 @@
             a.click();
         };
 
+        // ===== رفع الملفات =====
         document.getElementById('fileInput').onchange = function(e) {
             selectedFiles = Array.from(this.files);
             document.getElementById('counter').textContent = selectedFiles.length + ' مقطع';
@@ -915,12 +985,36 @@
                 });
             }
             
-            saveData();
+            saveData(); // هذا راح يحفظ ويحدث الأزرار
+            
             progress.style.display = 'none';
             document.getElementById('backBtn').click();
             
-            // تأكيد الرفع
             alert(`✅ تم رفع ${selectedFiles.length} مقاطع بنجاح!`);
+        };
+
+        // ===== أزرار المطور الجديدة =====
+        document.getElementById('refreshBtn').onclick = () => {
+            updateButtons();
+            alert('🔄 تم تحديث الأزرار');
+        };
+
+        document.getElementById('deleteAllBtn').onclick = () => {
+            document.getElementById('deleteAllModal').classList.add('active');
+        };
+
+        document.getElementById('confirmDeleteAll').onclick = () => {
+            videos = [];
+            saveData();
+            document.getElementById('deleteAllModal').classList.remove('active');
+            document.getElementById('videosPage').classList.remove('active');
+            document.querySelector('.buttons-header').style.display = 'flex';
+            document.getElementById('buttonsGrid').style.display = 'grid';
+            alert('🗑️ تم حذف جميع المقاطع');
+        };
+
+        document.getElementById('cancelDeleteAll').onclick = () => {
+            document.getElementById('deleteAllModal').classList.remove('active');
         };
 
         // ===== أحداث تسجيل الدخول =====
@@ -1022,6 +1116,7 @@
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
         };
 
+        // بدء التشغيل
         loadData();
     </script>
 </body>
