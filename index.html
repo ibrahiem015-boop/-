@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - تحميل ذكي للمقاطع</title>
+    <title>حصريات - مؤشرات التحميل</title>
     <style>
         * {
             margin: 0;
@@ -753,11 +753,6 @@
             justify-content: center;
             font-size: 40px;
             position: relative;
-            transition: transform 0.2s;
-        }
-
-        .video-card:hover .thumbnail {
-            transform: scale(1.05);
         }
 
         .video-date {
@@ -793,12 +788,14 @@
             color: white;
             font-size: 18px;
             cursor: pointer;
-            transition: transform 0.2s;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .play-icon:hover {
-            transform: scale(1.2);
-            color: #4ecdc4;
+            background: #4ecdc4;
+            color: black;
         }
 
         .delete-icon {
@@ -806,12 +803,13 @@
             font-size: 16px;
             cursor: pointer;
             padding: 5px;
-            transition: transform 0.2s;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .delete-icon:hover {
-            transform: scale(1.2);
-            opacity: 0.8;
+            background: #ff4757;
+            color: white;
         }
 
         .video-actions {
@@ -825,12 +823,13 @@
             font-size: 16px;
             cursor: pointer;
             padding: 5px;
-            transition: transform 0.2s;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .download-btn:hover {
-            transform: scale(1.2);
-            opacity: 0.8;
+            background: #4ecdc4;
+            color: black;
         }
 
         .subscription-modal {
@@ -1172,8 +1171,8 @@
             margin-left: 5px;
         }
         
-        /* مؤشر الرفع في الخلفية */
-        .background-upload-indicator {
+        /* مؤشر التحميل السفلي (للرفع والتنزيل) */
+        .global-indicator {
             position: fixed;
             bottom: 20px;
             left: 20px;
@@ -1185,11 +1184,67 @@
             z-index: 1000;
             display: none;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
         
-        .upload-speed {
+        .indicator-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .indicator-icon {
+            font-size: 20px;
+            margin-left: 10px;
+        }
+        
+        .indicator-title {
+            font-weight: bold;
+        }
+        
+        .indicator-progress {
+            color: #4ecdc4;
+        }
+        
+        .indicator-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .indicator-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .indicator-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .indicator-speed {
             color: #ff6b6b;
             font-weight: bold;
+        }
+        
+        .indicator-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        
+        .indicator-close:hover {
+            color: white;
         }
         
         /* زر تحميل المزيد */
@@ -1283,21 +1338,25 @@
     </div>
 
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - تحميل ذكي (ما يعلق) ✨
+        ✨ حصريات - مؤشرات التحميل ✨
     </div>
 
-    <!-- مؤشر الرفع في الخلفية -->
-    <div class="background-upload-indicator" id="uploadIndicator">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: white;">⚡ جاري الرفع في الخلفية</span>
-            <span style="color: #4ecdc4;" id="indicatorProgress">0%</span>
+    <!-- المؤشر العام (للرفع والتنزيل) -->
+    <div class="global-indicator" id="globalIndicator">
+        <div class="indicator-header">
+            <div>
+                <span class="indicator-icon" id="indicatorIcon">📦</span>
+                <span class="indicator-title" id="indicatorTitle">جاري التحميل</span>
+            </div>
+            <span class="indicator-progress" id="indicatorProgress">0%</span>
         </div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="indicatorBar" style="width: 0%;"></div>
+        <div class="indicator-bar">
+            <div class="indicator-fill" id="indicatorFill"></div>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #888; font-size: 12px;">
-            <span id="indicatorCount">0/0</span>
-            <span class="upload-speed" id="indicatorSpeed">🚀</span>
+        <div class="indicator-footer">
+            <span id="indicatorDetails">0/0</span>
+            <span class="indicator-speed" id="indicatorSpeed">🚀</span>
+            <button class="indicator-close" id="indicatorClose">✕</button>
         </div>
     </div>
 
@@ -1306,7 +1365,7 @@
         <div class="login-card">
             <div class="login-header">
                 <h1>🚀</h1>
-                <p>حصريات - تحميل ذكي</p>
+                <p>حصريات - مؤشرات التحميل</p>
             </div>
             
             <form id="loginForm">
@@ -1363,7 +1422,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
-                <span class="clean-badge" id="cleanBadge">📺 ذكي</span>
+                <span class="clean-badge" id="cleanBadge">📊 مؤشرات</span>
                 <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
@@ -1400,7 +1459,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك - تحميل ذكي للمقاطع
+            ✅ مرحباً بك - مؤشرات التحميل جاهزة
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1423,7 +1482,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (خلفي - ما يعلق)
+                    <span>📦</span> رفع مقاطع (مع مؤشر)
                 </button>
             </div>
 
@@ -1479,7 +1538,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع خلفي <span class="warning-badge">ما يعلق</span></h2>
+            <h2>📦 رفع مع مؤشر <span class="warning-badge">ما يعلق</span></h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1499,7 +1558,7 @@
                     <div style="color:#888; font-size:12px; margin-top:10px;" id="progressDetails"></div>
                 </div>
                 
-                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>بدء الرفع في الخلفية</button>
+                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>بدء الرفع</button>
                 <div class="back-btn" id="backToMainBtn">← العودة للرئيسية</div>
             </div>
         </div>
@@ -1597,16 +1656,20 @@
         let selectedFiles = [];
         let currentUser = null;
         let selectedForPublish = new Set();
-        let isUploading = false;
+        
+        // متغيرات المؤشر
+        let activeDownloads = 0;
+        let activeUploads = 0;
+        let downloadStartTime = null;
         let uploadStartTime = null;
         
         // متغيرات العرض التدريجي
         let displayedVideos = 0;
-        const VIDEOS_PER_PAGE = 6; // 6 مقاطع كل مرة (2×3)
+        const VIDEOS_PER_PAGE = 6;
         let isLoadingMore = false;
         
         // ========== IndexedDB ==========
-        const DB_NAME = 'HasryatVideosDB_Smart';
+        const DB_NAME = 'HasryatVideosDB_Indicator';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
 
@@ -1745,12 +1808,12 @@
 
         // حفظ المستخدمين
         function saveUsers() {
-            localStorage.setItem('hasryat_users_smart', JSON.stringify(users));
+            localStorage.setItem('hasryat_users_indicator', JSON.stringify(users));
         }
 
         // تحميل المستخدمين
         function loadUsers() {
-            const savedUsers = localStorage.getItem('hasryat_users_smart');
+            const savedUsers = localStorage.getItem('hasryat_users_indicator');
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
@@ -1769,6 +1832,47 @@
                 }
             }
             saveUsers();
+        }
+
+        // ========== دوال المؤشر العام ==========
+        function showIndicator(type, title, icon) {
+            const indicator = document.getElementById('globalIndicator');
+            document.getElementById('indicatorIcon').textContent = icon;
+            document.getElementById('indicatorTitle').textContent = title;
+            indicator.style.display = 'block';
+            
+            if (type === 'upload') {
+                uploadStartTime = Date.now();
+            } else if (type === 'download') {
+                downloadStartTime = Date.now();
+            }
+        }
+
+        function updateIndicator(completed, total, type, speed = null) {
+            const percentage = Math.round((completed / total) * 100);
+            document.getElementById('indicatorFill').style.width = percentage + '%';
+            document.getElementById('indicatorProgress').textContent = percentage + '%';
+            document.getElementById('indicatorDetails').textContent = `${completed}/${total}`;
+            
+            if (speed) {
+                document.getElementById('indicatorSpeed').textContent = `🚀 ${speed}`;
+            } else if (type === 'upload' && uploadStartTime) {
+                const elapsedSeconds = (Date.now() - uploadStartTime) / 1000;
+                const speed = elapsedSeconds > 0 ? (completed / elapsedSeconds).toFixed(1) : '0';
+                document.getElementById('indicatorSpeed').textContent = `🚀 ${speed} مقطع/ث`;
+            } else if (type === 'download' && downloadStartTime) {
+                const elapsedSeconds = (Date.now() - downloadStartTime) / 1000;
+                const speed = elapsedSeconds > 0 ? (completed / elapsedSeconds).toFixed(1) : '0';
+                document.getElementById('indicatorSpeed').textContent = `🚀 ${speed} مقطع/ث`;
+            }
+        }
+
+        function hideIndicator() {
+            setTimeout(() => {
+                if (activeUploads === 0 && activeDownloads === 0) {
+                    document.getElementById('globalIndicator').style.display = 'none';
+                }
+            }, 1000);
         }
 
         // ========== تحويل الملف إلى Base64 ==========
@@ -1793,8 +1897,11 @@
             });
         }
 
-        // ========== رفع سريع في الخلفية ==========
-        async function uploadFilesInBackground(files, progressCallback) {
+        // ========== رفع سريع في الخلفية مع مؤشر ==========
+        async function uploadFilesWithIndicator(files) {
+            activeUploads++;
+            showIndicator('upload', 'جاري رفع المقاطع', '📤');
+            
             const results = [];
             const total = files.length;
             let completed = 0;
@@ -1827,31 +1934,13 @@
                             
                             completed++;
                             
-                            const elapsedSeconds = (Date.now() - uploadStartTime) / 1000;
-                            const speed = elapsedSeconds > 0 ? (completed / elapsedSeconds).toFixed(1) : '0';
-                            
-                            progressCallback({
-                                completed,
-                                total,
-                                fileName: file.name,
-                                success: true,
-                                failed: failedCount,
-                                speed: speed
-                            });
+                            updateIndicator(completed, total, 'upload');
                             
                             return videoData;
                         } catch (error) {
                             failedCount++;
-                            
-                            progressCallback({
-                                completed: completed,
-                                total,
-                                fileName: file.name,
-                                success: false,
-                                failed: failedCount,
-                                error: error.message
-                            });
-                            
+                            completed++;
+                            updateIndicator(completed, total, 'upload');
                             return null;
                         }
                     })();
@@ -1881,19 +1970,52 @@
                         await saveVideoBatch(validResults);
                     }
                 }
-                
-                progressCallback({
-                    completed,
-                    total,
-                    isBatch: true,
-                    failed: failedCount
-                });
             }
+            
+            activeUploads--;
+            hideIndicator();
             
             return { 
                 results, 
                 failed: failedCount
             };
+        }
+
+        // ========== تحميل فيديو (للمطور فقط) ==========
+        async function downloadVideoWithIndicator(url, filename) {
+            if (!currentUser?.isDeveloper) {
+                alert('❌ التحميل متاح فقط للمطور');
+                return;
+            }
+            
+            activeDownloads++;
+            showIndicator('download', 'جاري تحميل المقطع', '📥');
+            
+            try {
+                updateIndicator(0, 1, 'download');
+                
+                // محاكاة التحميل (لأن الرابط مباشر)
+                setTimeout(() => {
+                    updateIndicator(1, 1, 'download');
+                }, 500);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                setTimeout(() => {
+                    activeDownloads--;
+                    hideIndicator();
+                }, 1000);
+                
+            } catch (error) {
+                activeDownloads--;
+                hideIndicator();
+                alert('خطأ في التحميل: ' + error.message);
+            }
         }
 
         // ========== حساب المساحة المستخدمة ==========
@@ -1942,11 +2064,9 @@
                 return;
             }
             
-            // عرض الدفعة التالية
             const start = displayedVideos;
             const end = Math.min(start + VIDEOS_PER_PAGE, videos.length);
             
-            // استخدام requestAnimationFrame للتحميل التدريجي
             requestAnimationFrame(() => {
                 for (let i = start; i < end; i++) {
                     const video = videos[i];
@@ -1958,15 +2078,24 @@
                     
                     let actionsHtml = '';
                     
-                    if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
+                    if (currentUser?.isDeveloper) {
+                        // للمطور: كل الصلاحيات
                         actionsHtml = `
                             <div class="video-actions">
                                 <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
-                                <span class="download-btn" onclick="event.stopPropagation(); downloadVideo('${video.url}', '${video.name}')">⬇️</span>
-                                ${currentUser?.isDeveloper ? `<span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${i})">🗑️</span>` : ''}
+                                <span class="download-btn" onclick="event.stopPropagation(); downloadVideoWithIndicator('${video.url}', '${video.name}')">⬇️</span>
+                                <span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${i})">🗑️</span>
+                            </div>
+                        `;
+                    } else if (video.uploadedBy === currentUser?.email) {
+                        // للمستخدم صاحب المقطع: تشغيل فقط
+                        actionsHtml = `
+                            <div class="video-actions">
+                                <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                             </div>
                         `;
                     } else {
+                        // للمستخدم العادي: تشغيل فقط
                         actionsHtml = `
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                         `;
@@ -1989,7 +2118,6 @@
                 
                 displayedVideos = end;
                 
-                // إظهار/إخفاء زر "عرض المزيد"
                 if (displayedVideos < videos.length) {
                     document.getElementById('loadMoreContainer').style.display = 'block';
                     document.getElementById('loadMoreBtn').innerHTML = `<span>عرض المزيد (${videos.length - displayedVideos} مقطع متبقي)</span>`;
@@ -2087,13 +2215,15 @@
         
         const clearAllBtn = document.getElementById('clearAllBtn');
         
-        const uploadIndicator = document.getElementById('uploadIndicator');
-        const indicatorProgress = document.getElementById('indicatorProgress');
-        const indicatorBar = document.getElementById('indicatorBar');
-        const indicatorCount = document.getElementById('indicatorCount');
-        const indicatorSpeed = document.getElementById('indicatorSpeed');
-        
+        const indicatorClose = document.getElementById('indicatorClose');
         const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+        // ========== إغلاق المؤشر يدوياً ==========
+        if (indicatorClose) {
+            indicatorClose.addEventListener('click', () => {
+                document.getElementById('globalIndicator').style.display = 'none';
+            });
+        }
 
         // ========== تبديل بين الصفحات ==========
         showRegisterBtn.addEventListener('click', () => {
@@ -2163,7 +2293,7 @@
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
-            const savedUser = localStorage.getItem('hasryat_current_user_smart');
+            const savedUser = localStorage.getItem('hasryat_current_user_indicator');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
@@ -2171,10 +2301,10 @@
                         currentUser = users[user.email];
                         showMainApp(currentUser);
                     } else {
-                        localStorage.removeItem('hasryat_current_user_smart');
+                        localStorage.removeItem('hasryat_current_user_indicator');
                     }
                 } catch (e) {
-                    localStorage.removeItem('hasryat_current_user_smart');
+                    localStorage.removeItem('hasryat_current_user_indicator');
                 }
             }
         }
@@ -2255,7 +2385,7 @@
                 currentUser = user;
                 
                 if (rememberMe.checked) {
-                    localStorage.setItem('hasryat_current_user_smart', JSON.stringify({ email: user.email }));
+                    localStorage.setItem('hasryat_current_user_indicator', JSON.stringify({ email: user.email }));
                 }
                 
                 showMainApp(user);
@@ -2386,15 +2516,8 @@
             }
         };
 
-        // ========== تحميل الفيديو ==========
-        window.downloadVideo = function(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        };
+        // ========== دالة التحميل العامة ==========
+        window.downloadVideoWithIndicator = downloadVideoWithIndicator;
 
         // ========== إظهار صفحة الرفع ==========
         if (showUploadPageBtn) {
@@ -2540,7 +2663,7 @@
             });
         }
 
-        // ========== رفع الملفات في الخلفية ==========
+        // ========== رفع الملفات مع مؤشر ==========
         function resetUploadForm() {
             selectedFiles = [];
             if (fileInput) fileInput.value = '';
@@ -2622,9 +2745,6 @@
                 uploadSubmitBtn.disabled = true;
                 fileInput.disabled = true;
                 
-                uploadIndicator.style.display = 'block';
-                uploadStartTime = Date.now();
-                
                 for (let i = 0; i < Math.min(selectedFiles.length, 30); i++) {
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
@@ -2634,66 +2754,42 @@
                 }
                 
                 try {
-                    uploadFilesInBackground(selectedFiles, (data) => {
-                        const percentage = Math.round((data.completed / data.total) * 100);
-                        indicatorBar.style.width = percentage + '%';
-                        indicatorProgress.textContent = percentage + '%';
-                        indicatorCount.textContent = `${data.completed}/${data.total}`;
-                        
-                        if (data.speed) {
-                            indicatorSpeed.textContent = `🚀 ${data.speed} مقطع/ث`;
+                    const { results, failed } = await uploadFilesWithIndicator(selectedFiles);
+                    
+                    for (let i = 0; i < Math.min(selectedFiles.length, 30); i++) {
+                        const statusEl = document.getElementById('status-' + i);
+                        if (statusEl) {
+                            statusEl.className = 'status success';
+                            statusEl.innerHTML = '✅';
                         }
+                    }
+                    
+                    const allVideos = await loadVideos();
+                    videos = allVideos.filter(v => 
+                        v.uploadedBy === currentUser.email || 
+                        v.isPublic === true
+                    );
+                    
+                    renderVideos(true);
+                    updateStorageInfo();
+                    
+                    setTimeout(() => {
+                        mainPage.classList.add('active');
+                        uploadPage.classList.remove('active');
+                        resetUploadForm();
+                        fileInput.disabled = false;
                         
-                        if (data.fileName) {
-                            const fileIndex = selectedFiles.findIndex(f => f.name === data.fileName);
-                            if (fileIndex >= 0 && fileIndex < 30) {
-                                const statusEl = document.getElementById('status-' + fileIndex);
-                                if (statusEl) {
-                                    if (data.success) {
-                                        statusEl.className = 'status success';
-                                        statusEl.innerHTML = '✅';
-                                    } else {
-                                        statusEl.className = 'status error';
-                                        statusEl.innerHTML = '❌';
-                                    }
-                                }
-                            }
-                        }
-                        
-                        if (data.completed === data.total) {
-                            setTimeout(async () => {
-                                const allVideos = await loadVideos();
-                                videos = allVideos.filter(v => 
-                                    v.uploadedBy === currentUser.email || 
-                                    v.isPublic === true
-                                );
-                                
-                                renderVideos(true);
-                                updateStorageInfo();
-                                
-                                setTimeout(() => {
-                                    uploadIndicator.style.display = 'none';
-                                }, 2000);
-                                
-                                mainPage.classList.add('active');
-                                uploadPage.classList.remove('active');
-                                resetUploadForm();
-                                fileInput.disabled = false;
-                                
-                                welcomeAlert.style.display = 'block';
-                                welcomeAlert.innerHTML = `✅ تم رفع ${data.completed - data.failed} مقاطع في الخلفية!`;
-                                setTimeout(() => {
-                                    welcomeAlert.style.display = 'none';
-                                }, 3000);
-                            }, 500);
-                        }
-                    });
+                        welcomeAlert.style.display = 'block';
+                        welcomeAlert.innerHTML = `✅ تم رفع ${results.length} مقاطع! ${failed > 0 ? `(${failed} فشل)` : ''}`;
+                        setTimeout(() => {
+                            welcomeAlert.style.display = 'none';
+                        }, 3000);
+                    }, 1500);
                     
                 } catch (error) {
                     alert('خطأ في رفع الملف: ' + error.message);
                     resetUploadForm();
                     fileInput.disabled = false;
-                    uploadIndicator.style.display = 'none';
                 }
             });
         }
@@ -2804,7 +2900,7 @@
 
         if (confirmExit) {
             confirmExit.addEventListener('click', () => {
-                localStorage.removeItem('hasryat_current_user_smart');
+                localStorage.removeItem('hasryat_current_user_indicator');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
                 mainApp.style.display = 'none';
