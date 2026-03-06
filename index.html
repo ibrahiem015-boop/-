@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - رفع ذكي للكميات الكبيرة</title>
+    <title>حصريات - تخزين جديد نظيف</title>
     <style>
         * {
             margin: 0;
@@ -1092,7 +1092,7 @@
             cursor: pointer;
         }
 
-        /* مؤشر التقدم للكميات الكبيرة */
+        /* مؤشر التقدم */
         .batch-progress {
             background: #222;
             border-radius: 20px;
@@ -1129,19 +1129,28 @@
             font-size: 11px;
             margin-right: 5px;
         }
+
+        .clean-badge {
+            background: #2ed573;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - رفع ذكي (يتحمل 100+ مقطع) ✨
+        ✨ حصريات - ملف جديد ونظيف (بدون مقاطع قديمة) ✨
     </div>
 
     <!-- صفحة تسجيل الدخول -->
     <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-header">
-                <h1>🎬</h1>
-                <p>حصريات - رفع ذكي</p>
+                <h1>🆕</h1>
+                <p>حصريات - بداية جديدة</p>
             </div>
             
             <form id="loginForm">
@@ -1198,6 +1207,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
+                <span class="clean-badge" id="cleanBadge">🆕 جديد</span>
                 <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
@@ -1234,7 +1244,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك
+            ✅ ملف جديد - لا توجد مقاطع قديمة
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1257,7 +1267,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (يتحمل 100+ مقطع)
+                    <span>📦</span> رفع مقاطع (يتحمل 1000+ مقطع)
                 </button>
             </div>
 
@@ -1308,7 +1318,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع ذكي <span class="warning-badge">يتحمل 100+ مقطع</span></h2>
+            <h2>📦 رفع ذكي <span class="warning-badge">يتحمل 1000+ مقطع</span></h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1394,12 +1404,34 @@
     </div>
 
     <script>
+        // ========== بداية جديدة - حذف كل التخزين القديم ==========
+        (function cleanOldStorage() {
+            // حذف كل التخزين القديم
+            localStorage.removeItem('hasryat_videos');
+            localStorage.removeItem('hasryat_videos_data');
+            localStorage.removeItem('hasryat_permanent_videos');
+            localStorage.removeItem('hasryat_users');
+            localStorage.removeItem('hasryat_current_user');
+            
+            // حذف IndexedDB القديم
+            try {
+                const request = indexedDB.deleteDatabase('HasryatVideosDB');
+                request.onsuccess = function() {
+                    console.log('✅ تم حذف قاعدة البيانات القديمة');
+                };
+            } catch (e) {
+                console.log('لا يوجد قاعدة بيانات قديمة');
+            }
+            
+            console.log('✅ تم تنظيف كل التخزين القديم');
+        })();
+
         // ========== حساب المطور ==========
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
         const DEVELOPER_NAME = 'مدير النظام';
 
-        // ========== المستخدمون ==========
+        // ========== المستخدمون (بداية جديدة) ==========
         let users = {
             [DEVELOPER_EMAIL]: {
                 email: DEVELOPER_EMAIL,
@@ -1411,22 +1443,22 @@
             }
         };
 
-        // ========== المتغيرات ==========
+        // ========== المتغيرات (بداية فاضية) ==========
         let videos = [];
         let selectedFiles = [];
         let currentUser = null;
         let selectedForPublish = new Set();
         
-        // ========== IndexedDB - تخزين غير محدود ==========
-        const DB_NAME = 'HasryatVideosDB';
+        // ========== IndexedDB جديد ==========
+        const DB_NAME = 'HasryatVideosDB_New'; // اسم جديد عشان ما يتعارض مع القديم
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
 
         // إعدادات الرفع للكميات الكبيرة
-        const BATCH_SIZE = 5; // نرفع 5 مقاطع كل مرة
-        const MAX_CONCURRENT = 3; // 3 مقاطع متوازية
+        const BATCH_SIZE = 10; // نرفع 10 مقاطع كل مرة
+        const MAX_CONCURRENT = 5; // 5 مقاطع متوازية
 
-        // فتح قاعدة البيانات
+        // فتح قاعدة البيانات الجديدة
         function openDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -1548,12 +1580,12 @@
 
         // حفظ المستخدمين
         function saveUsers() {
-            localStorage.setItem('hasryat_users', JSON.stringify(users));
+            localStorage.setItem('hasryat_users_new', JSON.stringify(users));
         }
 
         // تحميل المستخدمين
         function loadUsers() {
-            const savedUsers = localStorage.getItem('hasryat_users');
+            const savedUsers = localStorage.getItem('hasryat_users_new');
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
@@ -1574,7 +1606,7 @@
             saveUsers();
         }
 
-        // ========== تحويل الملف إلى Base64 (مع تحسين للأداء) ==========
+        // ========== تحويل الملف إلى Base64 ==========
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1588,11 +1620,11 @@
                         reader.abort();
                         reject(new Error('تجاوز الوقت للملف: ' + file.name));
                     }
-                }, 30000); // 30 ثانية كحد أقصى
+                }, 60000); // 60 ثانية كحد أقصى
             });
         }
 
-        // ========== رفع ذكي للكميات الكبيرة ==========
+        // ========== رفع ذكي للكميات الكبيرة جداً ==========
         async function uploadLargeBatch(files, progressCallback) {
             const results = [];
             const total = files.length;
@@ -1604,7 +1636,7 @@
                 const batch = files.slice(i, i + BATCH_SIZE);
                 const batchPromises = [];
                 
-                // معالجة الدفعة بالتوازي (لكن بعدد محدود)
+                // معالجة الدفعة بالتوازي
                 for (const file of batch) {
                     const promise = (async () => {
                         try {
@@ -1644,7 +1676,7 @@
                         batchPromises.length = 0;
                         
                         // نوقف شوي عشان ما نضغط على المتصفح
-                        await new Promise(r => setTimeout(r, 100));
+                        await new Promise(r => setTimeout(r, 50));
                     }
                 }
                 
@@ -1655,8 +1687,9 @@
                 }
                 
                 // حفظ الدفعة في قاعدة البيانات
-                if (results.length > 0) {
-                    await saveVideoBatch(results.slice(-batch.length));
+                const newResults = results.slice(-batch.length);
+                if (newResults.length > 0) {
+                    await saveVideoBatch(newResults);
                 }
                 
                 // تحديث الواجهة
@@ -1681,7 +1714,7 @@
                 const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
                 document.getElementById('storageUsed').textContent = sizeMB;
                 
-                const percentage = Math.min(100, (totalSize / (1024 * 1024 * 1024)) * 100); // 1 GB كحد أقصى للعرض
+                const percentage = Math.min(100, (totalSize / (1024 * 1024 * 1024)) * 100); // 1 GB
                 document.getElementById('storageBar').style.width = percentage + '%';
                 
                 document.getElementById('videoCount').textContent = `(${videos.length} مقطع)`;
@@ -1761,7 +1794,6 @@
         const counter = document.getElementById('counter');
         const filesList = document.getElementById('filesList');
         const uploadSubmitBtn = document.getElementById('uploadSubmitBtn');
-        const uploadProgress = document.getElementById('uploadProgress');
         const batchProgress = document.getElementById('batchProgress');
         const progressText = document.getElementById('progressText');
         const progressFill = document.getElementById('progressFill');
@@ -1851,7 +1883,7 @@
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
-            const savedUser = localStorage.getItem('hasryat_current_user');
+            const savedUser = localStorage.getItem('hasryat_current_user_new');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
@@ -1859,10 +1891,10 @@
                         currentUser = users[user.email];
                         showMainApp(currentUser);
                     } else {
-                        localStorage.removeItem('hasryat_current_user');
+                        localStorage.removeItem('hasryat_current_user_new');
                     }
                 } catch (e) {
-                    localStorage.removeItem('hasryat_current_user');
+                    localStorage.removeItem('hasryat_current_user_new');
                 }
             }
         }
@@ -1943,7 +1975,7 @@
                 currentUser = user;
                 
                 if (rememberMe.checked) {
-                    localStorage.setItem('hasryat_current_user', JSON.stringify({ email: user.email }));
+                    localStorage.setItem('hasryat_current_user_new', JSON.stringify({ email: user.email }));
                 }
                 
                 showMainApp(user);
@@ -2036,12 +2068,15 @@
             videosGrid.innerHTML = '';
             
             if (videos.length === 0) {
-                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥 لا توجد مقاطع</div>';
+                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥 لا توجد مقاطع - ابدأ برفع أول مقطع</div>';
                 totalVideosSpan.textContent = '0';
                 return;
             }
             
-            videos.slice(0, 30).forEach((video, index) => {
+            // عرض أول 30 مقطع فقط عشان الأداء
+            const displayVideos = videos.slice(0, 30);
+            
+            displayVideos.forEach((video, index) => {
                 const videoCard = document.createElement('div');
                 videoCard.className = 'video-card';
                 
@@ -2081,7 +2116,7 @@
                 moreDiv.style.textAlign = 'center';
                 moreDiv.style.padding = '20px';
                 moreDiv.style.color = '#888';
-                moreDiv.innerHTML = `... و ${videos.length - 30} مقطع آخر`;
+                moreDiv.innerHTML = `... و ${videos.length - 30} مقطع آخر (عرض أول 30 فقط)`;
                 videosGrid.appendChild(moreDiv);
             }
             
@@ -2198,7 +2233,10 @@
                 return;
             }
             
-            videos.slice(0, 50).forEach((video, index) => {
+            // عرض أول 50 مقطع فقط
+            const displayVideos = videos.slice(0, 50);
+            
+            displayVideos.forEach((video, index) => {
                 const item = document.createElement('div');
                 item.className = 'publish-item';
                 item.dataset.index = index;
@@ -2283,7 +2321,7 @@
             });
         }
 
-        // ========== رفع ذكي للكميات الكبيرة ==========
+        // ========== رفع ذكي للكميات الكبيرة جداً ==========
         function resetUploadForm() {
             selectedFiles = [];
             if (fileInput) fileInput.value = '';
@@ -2321,15 +2359,18 @@
                 uploadSubmitBtn.disabled = false;
                 fileLabel.innerHTML = '📦 ' + selectedFiles.length;
                 
-                if (selectedFiles.length > 20) {
-                    fileLabel.innerHTML += ' ⚠️ كمية كبيرة';
+                if (selectedFiles.length > 50) {
+                    fileLabel.innerHTML += ' ⚠️ كمية كبيرة جداً';
                 }
             } else {
                 uploadSubmitBtn.disabled = true;
                 fileLabel.innerHTML = '📁';
             }
             
-            selectedFiles.slice(0, 50).forEach((file, index) => {
+            // عرض أول 50 ملف فقط
+            const displayFiles = selectedFiles.slice(0, 50);
+            
+            displayFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.id = 'file-' + index;
@@ -2346,7 +2387,7 @@
                 moreDiv.style.textAlign = 'center';
                 moreDiv.style.padding = '10px';
                 moreDiv.style.color = '#888';
-                moreDiv.innerHTML = `... و ${selectedFiles.length - 50} ملف آخر`;
+                moreDiv.innerHTML = `... و ${selectedFiles.length - 50} ملف آخر (سيتم رفعهم جميعاً)`;
                 filesList.appendChild(moreDiv);
             }
         }
@@ -2364,6 +2405,7 @@
                 fileInput.disabled = true;
                 batchProgress.style.display = 'block';
                 
+                // تحديث حالة الملفات المعروضة
                 for (let i = 0; i < Math.min(selectedFiles.length, 50); i++) {
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
@@ -2520,7 +2562,7 @@
 
         if (confirmExit) {
             confirmExit.addEventListener('click', () => {
-                localStorage.removeItem('hasryat_current_user');
+                localStorage.removeItem('hasryat_current_user_new');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
                 mainApp.style.display = 'none';
@@ -2553,7 +2595,7 @@
             }
         });
 
-        // ========== بدء التشغيل ==========
+        // ========== بدء التشغيل مع ملف جديد نظيف ==========
         loadUsers();
         checkLogin();
     </script>
