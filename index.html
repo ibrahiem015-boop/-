@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - رفع فائق السرعة</title>
+    <title>حصريات - مقاطع المطور للجميع</title>
     <style>
         * {
             margin: 0;
@@ -1092,7 +1092,6 @@
             cursor: pointer;
         }
 
-        /* مؤشر التقدم */
         .batch-progress {
             background: #222;
             border-radius: 20px;
@@ -1138,19 +1137,28 @@
             font-size: 11px;
             margin-right: 5px;
         }
+        
+        .dev-badge-small {
+            background: #ff6b6b;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - رفع سريع ومستقر ✨
+        ✨ حصريات - مقاطع المطور للجميع ✨
     </div>
 
     <!-- صفحة تسجيل الدخول -->
     <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-header">
-                <h1>🚀</h1>
-                <p>حصريات - رفع فائق السرعة</p>
+                <h1>🎬</h1>
+                <p>حصريات - تسجيل الدخول</p>
             </div>
             
             <form id="loginForm">
@@ -1207,7 +1215,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
-                <span class="clean-badge" id="cleanBadge">🚀 سريع</span>
+                <span class="clean-badge" id="cleanBadge">👥 للجميع</span>
                 <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
@@ -1244,7 +1252,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك - الرفع أصبح أسرع
+            ✅ مرحباً بك
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1267,7 +1275,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (سريع ومستقر)
+                    <span>📦</span> رفع مقاطع (للمطور)
                 </button>
             </div>
 
@@ -1318,7 +1326,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع سريع <span class="warning-badge">يتحمل كميات كبيرة</span></h2>
+            <h2>📦 رفع مقاطع <span class="warning-badge">تظهر للجميع</span></h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1414,9 +1422,12 @@
                 localStorage.removeItem('hasryat_current_user');
                 localStorage.removeItem('hasryat_users_new');
                 localStorage.removeItem('hasryat_current_user_new');
+                localStorage.removeItem('hasryat_users_final');
+                localStorage.removeItem('hasryat_current_user_final');
                 
                 const request = indexedDB.deleteDatabase('HasryatVideosDB');
                 const request2 = indexedDB.deleteDatabase('HasryatVideosDB_New');
+                const request3 = indexedDB.deleteDatabase('HasryatVideosDB_Final');
                 
                 console.log('✅ تم تنظيف التخزين القديم');
             } catch (e) {
@@ -1448,13 +1459,13 @@
         let selectedForPublish = new Set();
         
         // ========== IndexedDB جديد ==========
-        const DB_NAME = 'HasryatVideosDB_Final';
+        const DB_NAME = 'HasryatVideosDB_Public';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
 
         // إعدادات الرفع
-        const BATCH_SIZE = 5; // 5 مقاطع كل مرة
-        const MAX_CONCURRENT = 3; // 3 مقاطع متوازية
+        const BATCH_SIZE = 5;
+        const MAX_CONCURRENT = 3;
 
         // فتح قاعدة البيانات
         function openDB() {
@@ -1471,6 +1482,7 @@
                         store.createIndex('name', 'name', { unique: false });
                         store.createIndex('date', 'date', { unique: false });
                         store.createIndex('uploadedBy', 'uploadedBy', { unique: false });
+                        store.createIndex('isPublic', 'isPublic', { unique: false });
                     }
                 };
             });
@@ -1586,12 +1598,12 @@
 
         // حفظ المستخدمين
         function saveUsers() {
-            localStorage.setItem('hasryat_users_final', JSON.stringify(users));
+            localStorage.setItem('hasryat_users_public', JSON.stringify(users));
         }
 
         // تحميل المستخدمين
         function loadUsers() {
-            const savedUsers = localStorage.getItem('hasryat_users_final');
+            const savedUsers = localStorage.getItem('hasryat_users_public');
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
@@ -1623,13 +1635,12 @@
                     reject(new Error('فشل قراءة الملف: ' + file.name));
                 };
                 
-                // مهلة زمنية للملفات الكبيرة
                 const timeout = setTimeout(() => {
                     if (reader.readyState !== 2) {
                         reader.abort();
                         reject(new Error('تجاوز الوقت للملف: ' + file.name));
                     }
-                }, 30000); // 30 ثانية
+                }, 30000);
                 
                 reader.onloadend = () => clearTimeout(timeout);
             });
@@ -1641,14 +1652,11 @@
             const total = files.length;
             let completed = 0;
             let failedCount = 0;
-            const errors = [];
             
-            // تقسيم الملفات إلى دفعات
             for (let i = 0; i < files.length; i += BATCH_SIZE) {
                 const batch = files.slice(i, i + BATCH_SIZE);
                 const batchPromises = [];
                 
-                // معالجة الدفعة
                 for (const file of batch) {
                     const promise = (async () => {
                         try {
@@ -1666,7 +1674,8 @@
                                 size: file.size,
                                 type: file.type || 'video/mp4',
                                 uploadedBy: currentUser ? currentUser.email : 'unknown',
-                                uploadedAt: new Date().toISOString()
+                                uploadedAt: new Date().toISOString(),
+                                isPublic: true // كل مقاطع المطور تكون عامة
                             };
                             
                             completed++;
@@ -1681,7 +1690,6 @@
                             return videoData;
                         } catch (error) {
                             failedCount++;
-                            errors.push(`${file.name}: ${error.message}`);
                             
                             progressCallback({
                                 completed: completed,
@@ -1698,7 +1706,6 @@
                     
                     batchPromises.push(promise);
                     
-                    // التحكم بعدد المقاطع المتوازية
                     if (batchPromises.length >= MAX_CONCURRENT) {
                         const batchResults = await Promise.all(batchPromises);
                         const validResults = batchResults.filter(r => r !== null);
@@ -1713,7 +1720,6 @@
                     }
                 }
                 
-                // انتظار باقي المقاطع
                 if (batchPromises.length > 0) {
                     const batchResults = await Promise.all(batchPromises);
                     const validResults = batchResults.filter(r => r !== null);
@@ -1724,7 +1730,6 @@
                     }
                 }
                 
-                // تحديث الواجهة بعد كل دفعة
                 progressCallback({
                     completed,
                     total,
@@ -1735,8 +1740,7 @@
             
             return { 
                 results, 
-                failed: failedCount,
-                errors 
+                failed: failedCount
             };
         }
 
@@ -1924,7 +1928,7 @@
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
-            const savedUser = localStorage.getItem('hasryat_current_user_final');
+            const savedUser = localStorage.getItem('hasryat_current_user_public');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
@@ -1932,10 +1936,10 @@
                         currentUser = users[user.email];
                         showMainApp(currentUser);
                     } else {
-                        localStorage.removeItem('hasryat_current_user_final');
+                        localStorage.removeItem('hasryat_current_user_public');
                     }
                 } catch (e) {
-                    localStorage.removeItem('hasryat_current_user_final');
+                    localStorage.removeItem('hasryat_current_user_public');
                 }
             }
         }
@@ -1980,11 +1984,16 @@
                 }
             }
             
-            videos = await loadVideos();
+            // تحميل كل الفيديوهات
+            const allVideos = await loadVideos();
             
-            if (!user.isDeveloper) {
-                videos = videos.filter(v => v.uploadedBy === user.email);
-            }
+            // المستخدم يشوف:
+            // 1. فيديوهاته الخاصة
+            // 2. فيديوهات المطور (لأن isPublic = true)
+            videos = allVideos.filter(v => 
+                v.uploadedBy === user.email || // فيديوهاته
+                v.isPublic === true // فيديوهات عامة (المطور)
+            );
             
             renderVideos();
             updateStorageInfo();
@@ -2016,7 +2025,7 @@
                 currentUser = user;
                 
                 if (rememberMe.checked) {
-                    localStorage.setItem('hasryat_current_user_final', JSON.stringify({ email: user.email }));
+                    localStorage.setItem('hasryat_current_user_public', JSON.stringify({ email: user.email }));
                 }
                 
                 showMainApp(user);
@@ -2109,7 +2118,7 @@
             videosGrid.innerHTML = '';
             
             if (videos.length === 0) {
-                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥 لا توجد مقاطع - ابدأ برفع أول مقطع</div>';
+                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥 لا توجد مقاطع</div>';
                 totalVideosSpan.textContent = '0';
                 return;
             }
@@ -2120,9 +2129,13 @@
                 const videoCard = document.createElement('div');
                 videoCard.className = 'video-card';
                 
+                // علامة إذا كان المقطع من المطور
+                const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
+                
                 let actionsHtml = '';
                 
                 if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
+                    // للمطور أو صاحب المقطع: كل الصلاحيات
                     actionsHtml = `
                         <div class="video-actions">
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
@@ -2131,6 +2144,7 @@
                         </div>
                     `;
                 } else {
+                    // للمستخدم العادي: تشغيل فقط
                     actionsHtml = `
                         <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                     `;
@@ -2140,6 +2154,7 @@
                     <div class="thumbnail">
                         🎬
                         <div class="video-date">${video.date || '??-??'}</div>
+                        ${isDevVideo ? '<span style="position:absolute; bottom:8px; right:8px; background:#ff6b6b; color:white; padding:2px 6px; border-radius:10px; font-size:9px;">مطور</span>' : ''}
                     </div>
                     <div class="video-footer">
                         <span class="video-name">${video.name.substring(0, 15)}${video.name.length > 15 ? '...' : ''}</span>
@@ -2199,7 +2214,14 @@
             
             if (confirm('هل أنت متأكد من حذف هذا المقطع؟')) {
                 await deleteVideoFromDB(id);
-                videos.splice(index, 1);
+                
+                // تحديث قائمة الفيديوهات
+                const allVideos = await loadVideos();
+                videos = allVideos.filter(v => 
+                    v.uploadedBy === currentUser.email || 
+                    v.isPublic === true
+                );
+                
                 renderVideos();
                 updateStorageInfo();
                 showSaveBadge('تم الحذف');
@@ -2454,7 +2476,7 @@
                 try {
                     const startTime = Date.now();
                     
-                    const { results, failed, errors } = await uploadFilesSmart(selectedFiles, (data) => {
+                    const { results, failed } = await uploadFilesSmart(selectedFiles, (data) => {
                         const percentage = Math.round((data.completed / data.total) * 100);
                         progressFill.style.width = percentage + '%';
                         progressText.innerHTML = `جاري الرفع: ${data.completed} من ${data.total}`;
@@ -2479,10 +2501,12 @@
                         }
                     });
                     
-                    videos = await loadVideos();
-                    if (!currentUser.isDeveloper) {
-                        videos = videos.filter(v => v.uploadedBy === currentUser.email);
-                    }
+                    // تحميل كل الفيديوهات المرفوعة
+                    const allVideos = await loadVideos();
+                    videos = allVideos.filter(v => 
+                        v.uploadedBy === currentUser.email || 
+                        v.isPublic === true
+                    );
                     
                     renderVideos();
                     updateStorageInfo();
@@ -2528,7 +2552,13 @@
                 
                 if (confirm('⚠️ هل أنت متأكد من حذف جميع المقاطع؟ لا يمكن التراجع عن هذا الإجراء!')) {
                     await clearAllVideos();
-                    videos = [];
+                    
+                    const allVideos = await loadVideos();
+                    videos = allVideos.filter(v => 
+                        v.uploadedBy === currentUser.email || 
+                        v.isPublic === true
+                    );
+                    
                     renderVideos();
                     updateStorageInfo();
                     showSaveBadge('تم حذف الكل');
@@ -2603,7 +2633,7 @@
 
         if (confirmExit) {
             confirmExit.addEventListener('click', () => {
-                localStorage.removeItem('hasryat_current_user_final');
+                localStorage.removeItem('hasryat_current_user_public');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
                 mainApp.style.display = 'none';
