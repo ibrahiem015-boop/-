@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - تخزين دائم</title>
+    <title>حصريات - تخزين غير محدود</title>
     <style>
         * {
             margin: 0;
@@ -980,7 +980,7 @@
             display: block;
         }
         
-        /* رسالة الحفظ التلقائي */
+        /* رسالة الحفظ */
         .save-badge {
             background: #4ecdc4;
             color: black;
@@ -990,23 +990,53 @@
             margin-right: 10px;
         }
         
+        /* مؤشر المساحة */
         .storage-info {
-            font-size: 11px;
+            background: #222;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
             color: #888;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .storage-bar {
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
             margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .storage-used {
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+        }
+        
+        .clear-all-btn {
+            background: #333;
+            color: #ff6b6b;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - تخزين دائم (المقاطع تبقى للأبد) ✨
+        ✨ حصريات - تخزين غير محدود (بدون مقاطع افتراضية) ✨
     </div>
 
     <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-header">
                 <h1>🎬</h1>
-                <p>حصريات - تخزين دائم</p>
+                <p>حصريات - مساحة غير محدودة</p>
             </div>
             
             <form id="loginForm">
@@ -1020,7 +1050,7 @@
                     <input type="checkbox" id="rememberMe" checked>
                     <label for="rememberMe">تذكرني</label>
                 </div>
-                <button type="submit" class="login-btn">دخول</button>
+                <button type="submit" class="login-btn">دخول المطور</button>
             </form>
         </div>
     </div>
@@ -1053,12 +1083,19 @@
             </div>
         </div>
 
-        <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك - المقاطع محفوظة بشكل دائم
+        <div class="storage-info">
+            <span>
+                💾 المساحة: <span id="storageUsed">0</span> MB
+                <span id="videoCount"></span>
+            </span>
+            <button class="clear-all-btn" id="clearAllBtn" style="display: none;">🗑️ حذف الكل</button>
+        </div>
+        <div class="storage-bar">
+            <div class="storage-used" id="storageBar"></div>
         </div>
 
-        <div class="storage-info" id="storageInfo">
-            💾 المساحة المستخدمة: <span id="storageUsed">0</span> MB
+        <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
+            ✅ مرحباً بك - التخزين غير محدود
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1081,7 +1118,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (تخزين دائم)
+                    <span>📦</span> رفع مقاطع (مساحة غير محدودة)
                 </button>
             </div>
 
@@ -1121,7 +1158,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع مقاطع (تخزين دائم)</h2>
+            <h2>📦 رفع مقاطع (تخزين غير محدود)</h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1134,7 +1171,7 @@
                 <div class="files-list" id="filesList"></div>
                 
                 <div id="uploadProgress" style="text-align: center; color: #4ecdc4; margin: 10px 0; display: none;">
-                    جاري تحويل المقاطع...
+                    جاري تحويل وحفظ المقاطع...
                 </div>
                 
                 <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>رفع وحفظ المقاطع</button>
@@ -1224,72 +1261,104 @@
         let selectedFiles = [];
         let currentUser = null;
         let selectedForPublish = new Set();
+        
+        // ========== IndexedDB - تخزين غير محدود ==========
+        const DB_NAME = 'HasryatVideosDB';
+        const STORE_NAME = 'videos';
+        const DB_VERSION = 1;
 
-        // ========== تحميل المقاطع المحفوظة ==========
-        function loadVideos() {
-            const savedVideos = localStorage.getItem('hasryat_permanent_videos');
-            if (savedVideos) {
-                try {
-                    videos = JSON.parse(savedVideos);
-                    showSaveBadge('تم تحميل ' + videos.length + ' مقطع');
-                } catch (e) {
-                    videos = [];
-                }
-            } else {
-                // نبدأ بمقاطع تجريبية تشتغل دايم
-                videos = [
-                    {
-                        id: 1,
-                        name: 'فيديو تجريبي 1',
-                        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                        date: '03-06'
-                    },
-                    {
-                        id: 2,
-                        name: 'فيديو تجريبي 2',
-                        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                        date: '03-05'
-                    }
-                ];
-                saveVideos();
-            }
-            updateStorageInfo();
-            renderVideos();
-        }
-
-        // ========== حفظ المقاطع بشكل دائم ==========
-        function saveVideos() {
-            localStorage.setItem('hasryat_permanent_videos', JSON.stringify(videos));
-            showSaveBadge('تم الحفظ');
-            updateStorageInfo();
-        }
-
-        // ========== عرض رسالة الحفظ ==========
-        function showSaveBadge(text) {
-            const badge = document.getElementById('saveBadge');
-            if (badge) {
-                badge.style.display = 'inline';
-                badge.textContent = '✓ ' + text;
-                setTimeout(() => {
-                    badge.style.display = 'none';
-                }, 2000);
-            }
-        }
-
-        // ========== حساب المساحة ==========
-        function updateStorageInfo() {
-            try {
-                let totalSize = 0;
-                videos.forEach(video => {
-                    if (video.url && video.url.startsWith('data:')) {
-                        totalSize += video.url.length;
-                    }
-                });
+        // فتح قاعدة البيانات
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
                 
-                const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-                document.getElementById('storageUsed').textContent = sizeMB;
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        // إنشاء جدول الفيديوهات
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('name', 'name', { unique: false });
+                        store.createIndex('date', 'date', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // تحميل كل الفيديوهات
+        async function loadVideos() {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readonly');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => {
+                        const loadedVideos = request.result || [];
+                        // نرتبهم من الأحدث للأقدم
+                        loadedVideos.sort((a, b) => (b.id || 0) - (a.id || 0));
+                        resolve(loadedVideos);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
             } catch (e) {
-                document.getElementById('storageUsed').textContent = '0';
+                console.log('خطأ في تحميل الفيديوهات:', e);
+                return [];
+            }
+        }
+
+        // حفظ فيديو جديد
+        async function saveVideo(videoData) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.put(videoData);
+                    
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (e) {
+                console.log('خطأ في حفظ الفيديو:', e);
+                throw e;
+            }
+        }
+
+        // حذف فيديو
+        async function deleteVideoFromDB(id) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.delete(id);
+                    
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (e) {
+                console.log('خطأ في حذف الفيديو:', e);
+            }
+        }
+
+        // حذف كل الفيديوهات
+        async function clearAllVideos() {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.clear();
+                    
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (e) {
+                console.log('خطأ في حذف الكل:', e);
             }
         }
 
@@ -1301,6 +1370,39 @@
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        // ========== حساب المساحة المستخدمة ==========
+        async function updateStorageInfo() {
+            try {
+                const videos = await loadVideos();
+                let totalSize = 0;
+                
+                videos.forEach(video => {
+                    if (video.url && video.url.startsWith('data:')) {
+                        // حجم الـ base64 تقريباً
+                        totalSize += video.url.length * 0.75;
+                    }
+                });
+                
+                const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+                document.getElementById('storageUsed').textContent = sizeMB;
+                
+                // نسبة الاستخدام (نفترض أن المساحة القصوى 500 MB للعرض)
+                const percentage = Math.min(100, (totalSize / (500 * 1024 * 1024)) * 100);
+                document.getElementById('storageBar').style.width = percentage + '%';
+                
+                document.getElementById('videoCount').textContent = `(${videos.length} مقطع)`;
+                
+                // إظهار زر الحذف إذا في مقاطع
+                if (videos.length > 0 && currentUser?.isDeveloper) {
+                    document.getElementById('clearAllBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('clearAllBtn').style.display = 'none';
+                }
+            } catch (e) {
+                console.log('خطأ في حساب المساحة');
+            }
         }
 
         // ========== عناصر DOM ==========
@@ -1373,6 +1475,8 @@
         const exitModal = document.getElementById('exitModal');
         const confirmExit = document.getElementById('confirmExit');
         const cancelExit = document.getElementById('cancelExit');
+        
+        const clearAllBtn = document.getElementById('clearAllBtn');
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
@@ -1392,7 +1496,7 @@
             }
         }
 
-        function showMainApp(user) {
+        async function showMainApp(user) {
             currentUser = user;
             loginPage.style.display = 'none';
             mainApp.style.display = 'block';
@@ -1431,12 +1535,15 @@
                 }
             }
             
+            // تحميل الفيديوهات
+            videos = await loadVideos();
+            renderVideos();
+            updateStorageInfo();
+            
             welcomeAlert.style.display = 'block';
             setTimeout(() => {
                 welcomeAlert.style.display = 'none';
             }, 3000);
-            
-            renderVideos();
         }
 
         // ========== تسجيل الدخول ==========
@@ -1542,7 +1649,8 @@
             videosGrid.innerHTML = '';
             
             if (videos.length === 0) {
-                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥</div>';
+                videosGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px; color:#333; font-size:60px;">🎥 لا توجد مقاطع</div>';
+                totalVideosSpan.textContent = '0';
                 return;
             }
             
@@ -1557,7 +1665,7 @@
                         <div class="video-actions">
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                             <span class="download-btn" onclick="event.stopPropagation(); downloadVideo('${video.url}', '${video.name}')">⬇️</span>
-                            <span class="delete-icon" onclick="event.stopPropagation(); deleteVideo(${index})">🗑️</span>
+                            <span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${index})">🗑️</span>
                         </div>
                     `;
                 } else {
@@ -1569,7 +1677,7 @@
                 videoCard.innerHTML = `
                     <div class="thumbnail">
                         🎬
-                        <div class="video-date">${video.date}</div>
+                        <div class="video-date">${video.date || '??-??'}</div>
                     </div>
                     <div class="video-footer">
                         <span class="video-name">${video.name.substring(0, 15)}${video.name.length > 15 ? '...' : ''}</span>
@@ -1611,16 +1719,18 @@
         };
 
         // ========== حذف الفيديو ==========
-        window.deleteVideo = function(index) {
+        window.deleteVideo = async function(id, index) {
             if (!currentUser?.isDeveloper) {
                 alert('❌ الحذف متاح فقط للمطور');
                 return;
             }
             
             if (confirm('هل أنت متأكد من حذف هذا المقطع؟')) {
+                await deleteVideoFromDB(id);
                 videos.splice(index, 1);
-                saveVideos();
                 renderVideos();
+                updateStorageInfo();
+                showSaveBadge('تم الحذف');
             }
         };
 
@@ -1792,6 +1902,17 @@
             if (uploadProgress) uploadProgress.style.display = 'none';
         }
 
+        function showSaveBadge(text) {
+            const badge = document.getElementById('saveBadge');
+            if (badge) {
+                badge.style.display = 'inline';
+                badge.textContent = '✓ ' + text;
+                setTimeout(() => {
+                    badge.style.display = 'none';
+                }, 2000);
+            }
+        }
+
         if (fileInput) {
             fileInput.addEventListener('change', updateFilesList);
         }
@@ -1858,13 +1979,18 @@
                         const month = (today.getMonth() + 1).toString().padStart(2, '0');
                         const day = today.getDate().toString().padStart(2, '0');
                         
-                        videos.push({
-                            id: Date.now() + i,
+                        const videoData = {
+                            id: Date.now() + i + Math.random(),
                             name: file.name,
-                            url: base64Data,  // نخزن الـ Base64 بدل الـ URL المؤقت
+                            url: base64Data,
                             date: `${month}-${day}`,
-                            size: file.size
-                        });
+                            size: file.size,
+                            type: file.type
+                        };
+                        
+                        // حفظ في IndexedDB
+                        await saveVideo(videoData);
+                        videos.push(videoData);
                         
                         const statusEl = document.getElementById('status-' + i);
                         if (statusEl) {
@@ -1873,10 +1999,14 @@
                         }
                     }
                     
-                    // حفظ كل المقاطع بشكل دائم
-                    saveVideos();
+                    // ترتيب الفيديوهات
+                    videos.sort((a, b) => (b.id || 0) - (a.id || 0));
                     
-                    uploadProgress.innerHTML = '✅ تم تحويل وحفظ جميع المقاطع!';
+                    renderVideos();
+                    updateStorageInfo();
+                    
+                    uploadProgress.innerHTML = '✅ تم حفظ جميع المقاطع في قاعدة البيانات!';
+                    showSaveBadge('تم الحفظ');
                     
                     setTimeout(() => {
                         mainPage.classList.add('active');
@@ -1885,7 +2015,7 @@
                         fileInput.disabled = false;
                         
                         welcomeAlert.style.display = 'block';
-                        welcomeAlert.innerHTML = '✅ تم حفظ المقاطع بشكل دائم!';
+                        welcomeAlert.innerHTML = `✅ تم حفظ ${selectedFiles.length} مقاطع بشكل دائم!`;
                         setTimeout(() => {
                             welcomeAlert.style.display = 'none';
                         }, 3000);
@@ -1895,6 +2025,24 @@
                     alert('خطأ في رفع الملف: ' + error.message);
                     resetUploadForm();
                     fileInput.disabled = false;
+                }
+            });
+        }
+
+        // ========== حذف كل المقاطع ==========
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', async () => {
+                if (!currentUser?.isDeveloper) {
+                    alert('❌ هذه الصفحة للمطور فقط');
+                    return;
+                }
+                
+                if (confirm('⚠️ هل أنت متأكد من حذف جميع المقاطع؟ لا يمكن التراجع عن هذا الإجراء!')) {
+                    await clearAllVideos();
+                    videos = [];
+                    renderVideos();
+                    updateStorageInfo();
+                    showSaveBadge('تم حذف الكل');
                 }
             });
         }
@@ -1939,11 +2087,7 @@
                 if (pendingList) {
                     pendingList.innerHTML = `
                         <div style="background:#222; padding:12px; border-radius:20px; margin-bottom:10px;">
-                            <div style="font-size:13px; color:#888; margin-bottom:5px;">📧 user1@email.com</div>
-                            <div style="display:flex; gap:8px;">
-                                <button style="flex:1; padding:8px; background:#2ed573; border:none; border-radius:20px; color:white;" onclick="alert('تم قبول الطلب')">قبول</button>
-                                <button style="flex:1; padding:8px; background:#ff4757; border:none; border-radius:20px; color:white;" onclick="alert('تم رفض الطلب')">رفض</button>
-                            </div>
+                            <div style="font-size:13px; color:#888; margin-bottom:5px;">📧 لا توجد طلبات حالياً</div>
                         </div>
                     `;
                 }
@@ -2000,7 +2144,7 @@
         });
 
         // ========== بدء التشغيل ==========
-        loadVideos();
+        // نبدأ بدون مقاطع افتراضية - المصفوفة فاضية
         checkLogin();
     </script>
 </body>
