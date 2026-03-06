@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - تخزين غير محدود</title>
+    <title>حصريات - منصة الفيديو</title>
     <style>
         * {
             margin: 0;
@@ -115,6 +115,29 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .register-link span {
+            color: #667eea;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .register-link span:hover {
+            text-decoration: underline;
         }
 
         .checkbox-group {
@@ -319,6 +342,44 @@
 
         .main-page.active {
             display: block;
+        }
+
+        .register-page {
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .register-page.active {
+            display: flex;
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 14px;
         }
 
         .create-user-page {
@@ -1029,29 +1090,64 @@
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - تخزين غير محدود (بدون مقاطع افتراضية) ✨
+        ✨ حصريات - منصة الفيديو ✨
     </div>
 
+    <!-- صفحة تسجيل الدخول -->
     <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-header">
                 <h1>🎬</h1>
-                <p>حصريات - مساحة غير محدودة</p>
+                <p>حصريات - تسجيل الدخول</p>
             </div>
             
             <form id="loginForm">
                 <div class="input-group">
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="x@x1xxx.com" required>
+                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="loginPassword" placeholder="كلمة المرور" value="1z5b" required>
+                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" id="rememberMe" checked>
                     <label for="rememberMe">تذكرني</label>
                 </div>
-                <button type="submit" class="login-btn">دخول المطور</button>
+                <button type="submit" class="login-btn">دخول</button>
             </form>
+            
+            <div class="register-link">
+                ليس لديك حساب؟ <span id="showRegisterBtn">إنشاء حساب جديد</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة إنشاء حساب جديد -->
+    <div class="register-page" id="registerPage">
+        <div class="register-card">
+            <div class="register-header">
+                <h1>✨</h1>
+                <p>إنشاء حساب جديد</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="input-group">
+                    <input type="text" id="registerName" placeholder="الاسم" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="registerPassword" placeholder="كلمة المرور" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="registerConfirmPassword" placeholder="تأكيد كلمة المرور" required>
+                </div>
+                <button type="submit" class="login-btn">تسجيل</button>
+            </form>
+            
+            <div class="register-link">
+                لديك حساب بالفعل؟ <span id="showLoginBtn">تسجيل الدخول</span>
+            </div>
         </div>
     </div>
 
@@ -1083,9 +1179,9 @@
             </div>
         </div>
 
-        <div class="storage-info">
+        <div class="storage-info" id="storageInfo">
             <span>
-                💾 المساحة: <span id="storageUsed">0</span> MB
+                💾 المساحة المستخدمة: <span id="storageUsed">0</span> MB
                 <span id="videoCount"></span>
             </span>
             <button class="clear-all-btn" id="clearAllBtn" style="display: none;">🗑️ حذف الكل</button>
@@ -1095,7 +1191,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك - التخزين غير محدود
+            ✅ مرحباً بك
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1104,7 +1200,7 @@
                 <div class="dev-title">⚙️ لوحة المطور</div>
                 <div class="dev-buttons">
                     <button class="dev-btn" id="createUserBtn">
-                        <span>👤</span> حساب جديد
+                        <span>👤</span> إنشاء حساب (يدوي)
                     </button>
                     <button class="dev-btn" id="pendingRequestsBtn">
                         <span>📋</span> طلبات اشتراك
@@ -1118,7 +1214,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (مساحة غير محدودة)
+                    <span>📦</span> رفع مقاطع (للمطور فقط)
                 </button>
             </div>
 
@@ -1130,14 +1226,24 @@
             <div class="videos-grid" id="videosGrid"></div>
         </div>
 
-        <!-- صفحة إنشاء حساب - تظهر فقط للمطور -->
+        <!-- صفحة إنشاء حساب يدوي (للمطور فقط) -->
         <div id="createUserPage" class="create-user-page dev-only">
-            <h2>👤 إنشاء حساب جديد</h2>
+            <h2>👤 إنشاء حساب يدوي</h2>
             
             <div class="create-user-form">
                 <div class="form-group">
                     <label>📧 البريد الإلكتروني</label>
                     <input type="email" id="newUserEmail" placeholder="user@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>🔑 كلمة المرور</label>
+                    <input type="text" id="newUserPassword" placeholder="كلمة المرور">
+                </div>
+                
+                <div class="form-group">
+                    <label>👤 الاسم</label>
+                    <input type="text" id="newUserName" placeholder="الاسم">
                 </div>
                 
                 <div class="form-group">
@@ -1148,6 +1254,7 @@
                         <option value="90">90 يوم</option>
                         <option value="180">180 يوم</option>
                         <option value="365">سنة كاملة (365 يوم)</option>
+                        <option value="0">غير محدود (للمطور)</option>
                     </select>
                 </div>
                 
@@ -1158,7 +1265,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع مقاطع (تخزين غير محدود)</h2>
+            <h2>📦 رفع مقاطع (للمطور فقط)</h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1201,9 +1308,9 @@
             <div class="password-title">تم إنشاء الحساب</div>
             <div class="password-box">
                 <div class="password-email" id="newUserEmailDisplay"></div>
-                <div class="password-display" id="newUserPassword"></div>
+                <div class="password-display" id="newUserPasswordDisplay"></div>
                 <div class="password-expiry" id="newUserExpiry"></div>
-                <button class="password-copy-btn" id="copyPasswordBtn">📋 نسخ كلمة المرور</button>
+                <button class="password-copy-btn" id="copyPasswordBtn">📋 نسخ البيانات</button>
             </div>
             <button class="password-close-btn" id="closePasswordModal">حسناً</button>
         </div>
@@ -1215,7 +1322,7 @@
             <div class="subscription-title">مدة الاشتراك</div>
             <div class="subscription-days" id="modalDaysLeft">∞</div>
             <div class="subscription-label">يوم</div>
-            <div class="subscription-date" id="modalExpiryDate">📅 حساب مطور</div>
+            <div class="subscription-date" id="modalExpiryDate">📅 حساب عادي</div>
             <button class="subscription-close" id="closeSubscriptionModal">حسناً</button>
         </div>
     </div>
@@ -1240,10 +1347,10 @@
     </div>
 
     <script>
-        // ========== حساب المطور ==========
-        const DEVELOPER_EMAIL = 'x@x1xxx.com';
-        const DEVELOPER_PASSWORD = '1z5b';
-        const DEVELOPER_NAME = 'ناي القوية';
+        // ========== حساب المطور (مخفي وما يظهر) ==========
+        const DEVELOPER_EMAIL = 'admin@hasryat.com';
+        const DEVELOPER_PASSWORD = 'Admin@123';
+        const DEVELOPER_NAME = 'مدير النظام';
 
         // ========== المستخدمون ==========
         let users = {
@@ -1252,7 +1359,8 @@
                 name: DEVELOPER_NAME,
                 password: DEVELOPER_PASSWORD,
                 isDeveloper: true,
-                expiresAt: null
+                expiresAt: null,
+                createdAt: new Date().toISOString()
             }
         };
 
@@ -1278,10 +1386,10 @@
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        // إنشاء جدول الفيديوهات
                         const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                         store.createIndex('name', 'name', { unique: false });
                         store.createIndex('date', 'date', { unique: false });
+                        store.createIndex('uploadedBy', 'uploadedBy', { unique: false });
                     }
                 };
             });
@@ -1298,7 +1406,6 @@
                     
                     request.onsuccess = () => {
                         const loadedVideos = request.result || [];
-                        // نرتبهم من الأحدث للأقدم
                         loadedVideos.sort((a, b) => (b.id || 0) - (a.id || 0));
                         resolve(loadedVideos);
                     };
@@ -1362,6 +1469,35 @@
             }
         }
 
+        // حفظ المستخدمين
+        function saveUsers() {
+            localStorage.setItem('hasryat_users', JSON.stringify(users));
+        }
+
+        // تحميل المستخدمين
+        function loadUsers() {
+            const savedUsers = localStorage.getItem('hasryat_users');
+            if (savedUsers) {
+                try {
+                    users = JSON.parse(savedUsers);
+                    // نتأكد أن المطور موجود
+                    if (!users[DEVELOPER_EMAIL]) {
+                        users[DEVELOPER_EMAIL] = {
+                            email: DEVELOPER_EMAIL,
+                            name: DEVELOPER_NAME,
+                            password: DEVELOPER_PASSWORD,
+                            isDeveloper: true,
+                            expiresAt: null,
+                            createdAt: new Date().toISOString()
+                        };
+                    }
+                } catch (e) {
+                    console.log('خطأ في تحميل المستخدمين');
+                }
+            }
+            saveUsers();
+        }
+
         // ========== تحويل الملف إلى Base64 ==========
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
@@ -1380,7 +1516,6 @@
                 
                 videos.forEach(video => {
                     if (video.url && video.url.startsWith('data:')) {
-                        // حجم الـ base64 تقريباً
                         totalSize += video.url.length * 0.75;
                     }
                 });
@@ -1388,13 +1523,11 @@
                 const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
                 document.getElementById('storageUsed').textContent = sizeMB;
                 
-                // نسبة الاستخدام (نفترض أن المساحة القصوى 500 MB للعرض)
                 const percentage = Math.min(100, (totalSize / (500 * 1024 * 1024)) * 100);
                 document.getElementById('storageBar').style.width = percentage + '%';
                 
                 document.getElementById('videoCount').textContent = `(${videos.length} مقطع)`;
                 
-                // إظهار زر الحذف إذا في مقاطع
                 if (videos.length > 0 && currentUser?.isDeveloper) {
                     document.getElementById('clearAllBtn').style.display = 'inline-block';
                 } else {
@@ -1407,11 +1540,19 @@
 
         // ========== عناصر DOM ==========
         const loginPage = document.getElementById('loginPage');
+        const registerPage = document.getElementById('registerPage');
         const mainApp = document.getElementById('mainApp');
         const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
         const loginEmail = document.getElementById('loginEmail');
         const loginPassword = document.getElementById('loginPassword');
+        const registerName = document.getElementById('registerName');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerPassword = document.getElementById('registerPassword');
+        const registerConfirmPassword = document.getElementById('registerConfirmPassword');
         const rememberMe = document.getElementById('rememberMe');
+        const showRegisterBtn = document.getElementById('showRegisterBtn');
+        const showLoginBtn = document.getElementById('showLoginBtn');
         const userEmailText = document.getElementById('userEmailText');
         const userNameDisplay = document.getElementById('userNameDisplay');
         const verifiedBadge = document.getElementById('verifiedBadge');
@@ -1445,12 +1586,14 @@
         
         const createUserBtn = document.getElementById('createUserBtn');
         const newUserEmail = document.getElementById('newUserEmail');
+        const newUserPassword = document.getElementById('newUserPassword');
+        const newUserName = document.getElementById('newUserName');
         const subscriptionDays = document.getElementById('subscriptionDays');
         const createUserSubmit = document.getElementById('createUserSubmit');
         
         const passwordModal = document.getElementById('passwordModal');
         const newUserEmailDisplay = document.getElementById('newUserEmailDisplay');
-        const newUserPassword = document.getElementById('newUserPassword');
+        const newUserPasswordDisplay = document.getElementById('newUserPasswordDisplay');
         const newUserExpiry = document.getElementById('newUserExpiry');
         const copyPasswordBtn = document.getElementById('copyPasswordBtn');
         const closePasswordModal = document.getElementById('closePasswordModal');
@@ -1478,6 +1621,75 @@
         
         const clearAllBtn = document.getElementById('clearAllBtn');
 
+        // ========== تبديل بين صفحة التسجيل وصفحة إنشاء حساب ==========
+        showRegisterBtn.addEventListener('click', () => {
+            loginPage.style.display = 'none';
+            registerPage.style.display = 'flex';
+        });
+
+        showLoginBtn.addEventListener('click', () => {
+            registerPage.style.display = 'none';
+            loginPage.style.display = 'flex';
+        });
+
+        // ========== تسجيل مستخدم جديد ==========
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = registerName.value.trim();
+            const email = registerEmail.value.trim();
+            const password = registerPassword.value;
+            const confirmPassword = registerConfirmPassword.value;
+            
+            if (!name || !email || !password) {
+                alert('❌ الرجاء ملء جميع الحقول');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('❌ كلمة المرور غير متطابقة');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+            
+            if (users[email]) {
+                alert('❌ هذا البريد الإلكتروني مسجل بالفعل');
+                return;
+            }
+            
+            // حساب تاريخ انتهاء الاشتراك (افتراضي 30 يوم تجريبي)
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 30);
+            
+            const newUser = {
+                email: email,
+                name: name,
+                password: password,
+                isDeveloper: false,
+                expiresAt: expiresAt.toISOString(),
+                createdAt: new Date().toISOString()
+            };
+            
+            users[email] = newUser;
+            saveUsers();
+            
+            alert('✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن');
+            
+            // تنظيف الحقول
+            registerName.value = '';
+            registerEmail.value = '';
+            registerPassword.value = '';
+            registerConfirmPassword.value = '';
+            
+            // العودة لصفحة تسجيل الدخول
+            registerPage.style.display = 'none';
+            loginPage.style.display = 'flex';
+        });
+
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
             const savedUser = localStorage.getItem('hasryat_current_user');
@@ -1499,6 +1711,7 @@
         async function showMainApp(user) {
             currentUser = user;
             loginPage.style.display = 'none';
+            registerPage.style.display = 'none';
             mainApp.style.display = 'block';
             animatedHeader.style.display = 'block';
             
@@ -1535,8 +1748,13 @@
                 }
             }
             
-            // تحميل الفيديوهات
             videos = await loadVideos();
+            
+            // تصفية الفيديوهات حسب المستخدم (كل مستخدم يرى فيديوهاته فقط)
+            if (!user.isDeveloper) {
+                videos = videos.filter(v => v.uploadedBy === user.email);
+            }
+            
             renderVideos();
             updateStorageInfo();
             
@@ -1550,13 +1768,13 @@
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const email = loginEmail.value;
+            const email = loginEmail.value.trim();
             const password = loginPassword.value;
             
             if (users[email] && users[email].password === password) {
                 const user = users[email];
                 
-                if (user.expiresAt) {
+                if (user.expiresAt && !user.isDeveloper) {
                     const expiryDate = new Date(user.expiresAt);
                     if (expiryDate < new Date()) {
                         alert('❌ انتهت صلاحية الاشتراك');
@@ -1576,7 +1794,7 @@
             }
         });
 
-        // ========== إنشاء حساب جديد ==========
+        // ========== إنشاء حساب يدوي (للمطور فقط) ==========
         createUserBtn.addEventListener('click', () => {
             if (!currentUser?.isDeveloper) {
                 alert('❌ هذه الصفحة للمطور فقط');
@@ -1584,6 +1802,7 @@
             }
             mainPage.classList.remove('active');
             createUserPage.classList.add('active');
+            devMenu.classList.remove('visible');
         });
 
         backFromCreateBtn.addEventListener('click', () => {
@@ -1597,11 +1816,13 @@
                 return;
             }
             
-            const email = newUserEmail.value;
+            const email = newUserEmail.value.trim();
+            const password = newUserPassword.value.trim();
+            const name = newUserName.value.trim() || email.split('@')[0];
             const days = parseInt(subscriptionDays.value);
             
-            if (!email) {
-                alert('❌ الرجاء إدخال البريد الإلكتروني');
+            if (!email || !password) {
+                alert('❌ الرجاء إدخال البريد الإلكتروني وكلمة المرور');
                 return;
             }
             
@@ -1610,30 +1831,38 @@
                 return;
             }
             
-            const password = Math.random().toString(36).slice(-8) + Math.floor(Math.random() * 1000);
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + days);
+            let expiresAt = null;
+            if (days > 0) {
+                expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + days);
+            }
             
             users[email] = {
                 email: email,
-                name: email.split('@')[0],
+                name: name,
                 password: password,
                 isDeveloper: false,
-                expiresAt: expiresAt.toISOString()
+                expiresAt: expiresAt ? expiresAt.toISOString() : null,
+                createdAt: new Date().toISOString()
             };
             
+            saveUsers();
+            
             newUserEmailDisplay.textContent = email;
-            newUserPassword.textContent = password;
-            newUserExpiry.textContent = `📅 تنتهي: ${expiresAt.toLocaleDateString('ar-EG')}`;
+            newUserPasswordDisplay.textContent = password;
+            newUserExpiry.textContent = expiresAt ? `📅 تنتهي: ${expiresAt.toLocaleDateString('ar-EG')}` : '📅 غير محدود';
             passwordModal.classList.add('active');
             
             newUserEmail.value = '';
+            newUserPassword.value = '';
+            newUserName.value = '';
             subscriptionDays.value = '30';
         });
 
         copyPasswordBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(newUserPassword.textContent);
-            alert('✅ تم نسخ كلمة المرور');
+            const text = `البريد: ${newUserEmailDisplay.textContent}\nكلمة المرور: ${newUserPasswordDisplay.textContent}\n${newUserExpiry.textContent}`;
+            navigator.clipboard.writeText(text);
+            alert('✅ تم نسخ البيانات');
         });
 
         closePasswordModal.addEventListener('click', () => {
@@ -1660,12 +1889,12 @@
                 
                 let actionsHtml = '';
                 
-                if (currentUser?.isDeveloper) {
+                if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
                     actionsHtml = `
                         <div class="video-actions">
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
                             <span class="download-btn" onclick="event.stopPropagation(); downloadVideo('${video.url}', '${video.name}')">⬇️</span>
-                            <span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${index})">🗑️</span>
+                            ${currentUser?.isDeveloper ? `<span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${index})">🗑️</span>` : ''}
                         </div>
                     `;
                 } else {
@@ -1736,11 +1965,6 @@
 
         // ========== تحميل الفيديو ==========
         window.downloadVideo = function(url, filename) {
-            if (!currentUser?.isDeveloper) {
-                alert('❌ التحميل متاح فقط للمطور');
-                return;
-            }
-            
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
@@ -1959,7 +2183,6 @@
                 fileInput.disabled = true;
                 uploadProgress.style.display = 'block';
                 
-                // تحديث حالة الملفات
                 for (let i = 0; i < selectedFiles.length; i++) {
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
@@ -1972,7 +2195,6 @@
                     for (let i = 0; i < selectedFiles.length; i++) {
                         const file = selectedFiles[i];
                         
-                        // تحويل الملف إلى Base64
                         const base64Data = await fileToBase64(file);
                         
                         const today = new Date();
@@ -1985,12 +2207,17 @@
                             url: base64Data,
                             date: `${month}-${day}`,
                             size: file.size,
-                            type: file.type
+                            type: file.type,
+                            uploadedBy: currentUser.email,
+                            uploadedAt: new Date().toISOString()
                         };
                         
-                        // حفظ في IndexedDB
                         await saveVideo(videoData);
-                        videos.push(videoData);
+                        
+                        // إذا كان المطور يشوف كل الفيديوهات
+                        if (currentUser.isDeveloper) {
+                            videos.push(videoData);
+                        }
                         
                         const statusEl = document.getElementById('status-' + i);
                         if (statusEl) {
@@ -1999,13 +2226,14 @@
                         }
                     }
                     
-                    // ترتيب الفيديوهات
-                    videos.sort((a, b) => (b.id || 0) - (a.id || 0));
+                    if (currentUser.isDeveloper) {
+                        videos.sort((a, b) => (b.id || 0) - (a.id || 0));
+                    }
                     
                     renderVideos();
                     updateStorageInfo();
                     
-                    uploadProgress.innerHTML = '✅ تم حفظ جميع المقاطع في قاعدة البيانات!';
+                    uploadProgress.innerHTML = '✅ تم حفظ جميع المقاطع!';
                     showSaveBadge('تم الحفظ');
                     
                     setTimeout(() => {
@@ -2015,7 +2243,7 @@
                         fileInput.disabled = false;
                         
                         welcomeAlert.style.display = 'block';
-                        welcomeAlert.innerHTML = `✅ تم حفظ ${selectedFiles.length} مقاطع بشكل دائم!`;
+                        welcomeAlert.innerHTML = `✅ تم رفع ${selectedFiles.length} مقاطع بنجاح!`;
                         setTimeout(() => {
                             welcomeAlert.style.display = 'none';
                         }, 3000);
@@ -2084,13 +2312,18 @@
                     return;
                 }
                 
-                if (pendingList) {
-                    pendingList.innerHTML = `
+                // عرض المستخدمين المسجلين
+                const userList = Object.values(users)
+                    .filter(u => !u.isDeveloper)
+                    .map(u => `
                         <div style="background:#222; padding:12px; border-radius:20px; margin-bottom:10px;">
-                            <div style="font-size:13px; color:#888; margin-bottom:5px;">📧 لا توجد طلبات حالياً</div>
+                            <div style="font-size:13px; color:#4ecdc4;">👤 ${u.name}</div>
+                            <div style="font-size:12px; color:#888;">📧 ${u.email}</div>
+                            <div style="font-size:11px; color:#ffa502;">📅 ${new Date(u.createdAt).toLocaleDateString('ar-EG')}</div>
                         </div>
-                    `;
-                }
+                    `).join('') || '<div style="color:#888; text-align:center;">لا يوجد مستخدمين</div>';
+                
+                pendingList.innerHTML = userList;
                 pendingModal.classList.add('active');
                 devMenu.classList.remove('visible');
             });
@@ -2113,8 +2346,8 @@
                 localStorage.removeItem('hasryat_current_user');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
-                loginPage.style.display = 'flex';
                 mainApp.style.display = 'none';
+                loginPage.style.display = 'flex';
                 exitModal.classList.remove('active');
             });
         }
@@ -2144,7 +2377,7 @@
         });
 
         // ========== بدء التشغيل ==========
-        // نبدأ بدون مقاطع افتراضية - المصفوفة فاضية
+        loadUsers();
         checkLogin();
     </script>
 </body>
