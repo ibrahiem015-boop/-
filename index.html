@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حصريات - مساحة غير محدودة</title>
+    <title>حصريات - منصة الفيديو</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,6 @@
             margin: 0 auto;
         }
 
-        /* ===== شريط التنقل ===== */
         .navbar {
             background: #1a1a1a;
             border-radius: 40px;
@@ -100,7 +99,6 @@
             font-size: 18px;
         }
 
-        /* ===== إحصائيات ===== */
         .stats-bar {
             background: linear-gradient(135deg, #ff6b6b20, #4ecdc420);
             border-radius: 30px;
@@ -129,7 +127,6 @@
             margin-top: 5px;
         }
 
-        /* ===== أزرار المطور ===== */
         .upload-section {
             margin: 20px 0;
             display: none;
@@ -156,11 +153,6 @@
             transition: 0.3s;
         }
 
-        .upload-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 20px rgba(255,107,107,0.3);
-        }
-
         .dev-actions {
             display: flex;
             gap: 10px;
@@ -185,7 +177,6 @@
 
         .dev-action-btn:hover {
             background: #ff6b6b;
-            border-color: #4ecdc4;
         }
 
         .dev-action-btn.danger {
@@ -196,7 +187,6 @@
             background: #ff4757;
         }
 
-        /* ===== الأزرار الرئيسية ===== */
         .buttons-header {
             display: flex;
             justify-content: space-between;
@@ -226,7 +216,6 @@
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
             margin: 20px 0 40px;
-            min-height: 100px;
         }
 
         .page-button {
@@ -240,7 +229,6 @@
             color: white;
             display: block;
             animation: fadeIn 0.3s ease;
-            position: relative;
         }
 
         .page-button:hover {
@@ -275,19 +263,6 @@
             color: #888;
         }
 
-        .video-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: #4ecdc4;
-            color: black;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        /* ===== صفحة الرفع ===== */
         .upload-page {
             background: #1a1a1a;
             border-radius: 30px;
@@ -369,11 +344,6 @@
             padding: 10px;
         }
 
-        .back-btn:hover {
-            color: #4ecdc4;
-        }
-
-        /* ===== مؤشر التحميل ===== */
         .upload-progress {
             position: fixed;
             bottom: 20px;
@@ -415,7 +385,6 @@
             text-align: center;
         }
 
-        /* ===== صفحة المقاطع ===== */
         .videos-page {
             background: #1a1a1a;
             border-radius: 30px;
@@ -632,10 +601,52 @@
             margin-top: 15px;
             display: block;
         }
+
+        .video-player {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .video-player.active {
+            display: flex;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .close-player {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 3001;
+        }
     </style>
 </head>
 <body>
-    <!-- مؤشر التحميل -->
+    <!-- مشغل الفيديو -->
+    <div class="video-player" id="videoPlayer">
+        <button class="close-player" onclick="closeVideo()">✕</button>
+        <video id="playerVideo" controls></video>
+    </div>
+
     <div class="upload-progress" id="uploadProgress">
         <div class="progress-header">
             <span>📤 جاري الرفع</span>
@@ -662,7 +673,7 @@
 
     <div class="modal" id="createUserModal">
         <div class="modal-content">
-            <h2 style="color:#4ecdc4;">✨ إنشاء حساب</h2>
+            <h2 style="color:#4ecdc4;">✨ إنشاء حساب (للمطور)</h2>
             <input type="text" id="newName" placeholder="الاسم">
             <input type="email" id="newEmail" placeholder="البريد">
             <input type="text" id="newPassword" placeholder="كلمة المرور">
@@ -705,7 +716,7 @@
 
     <div class="container">
         <div class="animated-header">
-            ✨ حصريات - مساحة غير محدودة ✨
+            ✨ حصريات - منصة الفيديو ✨
         </div>
 
         <div class="navbar">
@@ -768,13 +779,6 @@
     </div>
 
     <script>
-        // ===== كود التشخيص =====
-        console.log('✅ بدأ التشغيل');
-        window.onerror = function(msg, url, line) {
-            console.error('❌ خطأ:', msg, 'في السطر', line);
-            alert('خطأ: ' + msg + ' في السطر ' + line);
-        };
-
         // ===== إعدادات =====
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
@@ -794,7 +798,7 @@
         let videos = [];
         let selectedFiles = [];
 
-        // ===== IndexedDB (مساحة غير محدودة) =====
+        // ===== IndexedDB =====
         const DB_NAME = 'HasryatDB';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
@@ -802,24 +806,12 @@
         function openDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
-                request.onerror = () => {
-                    console.error('❌ فشل فتح DB:', request.error);
-                    reject(request.error);
-                };
-                
-                request.onsuccess = () => {
-                    console.log('✅ DB مفتوحة');
-                    resolve(request.result);
-                };
-                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                        store.createIndex('name', 'name', { unique: false });
-                        store.createIndex('uploadedBy', 'uploadedBy', { unique: false });
-                        console.log('✅ تم إنشاء store');
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                     }
                 };
             });
@@ -828,105 +820,39 @@
         async function loadVideos() {
             try {
                 const db = await openDB();
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     const transaction = db.transaction(STORE_NAME, 'readonly');
                     const store = transaction.objectStore(STORE_NAME);
                     const request = store.getAll();
-                    
-                    request.onsuccess = () => {
-                        const loaded = request.result || [];
-                        console.log('✅ تم تحميل', loaded.length, 'مقطع');
-                        resolve(loaded);
-                    };
-                    request.onerror = () => {
-                        console.error('❌ فشل تحميل:', request.error);
-                        resolve([]);
-                    };
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => resolve([]);
                 });
             } catch (e) {
-                console.error('❌ خطأ في loadVideos:', e);
                 return [];
             }
         }
 
         async function saveVideo(videoData) {
-            try {
-                const db = await openDB();
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(STORE_NAME, 'readwrite');
-                    const store = transaction.objectStore(STORE_NAME);
-                    const request = store.put(videoData);
-                    
-                    request.onsuccess = () => {
-                        console.log('✅ تم حفظ مقطع:', videoData.name);
-                        resolve();
-                    };
-                    request.onerror = () => {
-                        console.error('❌ فشل حفظ:', request.error);
-                        reject(request.error);
-                    };
-                });
-            } catch (e) {
-                console.error('❌ خطأ في saveVideo:', e);
-                throw e;
-            }
-        }
-
-        async function saveVideoBatch(videosBatch) {
-            if (!videosBatch || videosBatch.length === 0) return;
-            
-            try {
-                const db = await openDB();
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(STORE_NAME, 'readwrite');
-                    const store = transaction.objectStore(STORE_NAME);
-                    
-                    let completed = 0;
-                    for (const video of videosBatch) {
-                        const request = store.put(video);
-                        request.onsuccess = () => {
-                            completed++;
-                            if (completed === videosBatch.length) {
-                                console.log('✅ تم حفظ', completed, 'مقطع');
-                                resolve();
-                            }
-                        };
-                        request.onerror = (e) => {
-                            console.error('❌ فشل حفظ فيديو:', e);
-                            completed++;
-                            if (completed === videosBatch.length) resolve();
-                        };
-                    }
-                });
-            } catch (e) {
-                console.error('❌ خطأ في saveVideoBatch:', e);
-                throw e;
-            }
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(videoData);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject();
+            });
         }
 
         async function deleteAllVideos() {
-            try {
-                const db = await openDB();
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(STORE_NAME, 'readwrite');
-                    const store = transaction.objectStore(STORE_NAME);
-                    const request = store.clear();
-                    
-                    request.onsuccess = () => {
-                        console.log('✅ تم حذف الكل');
-                        resolve();
-                    };
-                    request.onerror = () => {
-                        console.error('❌ فشل حذف:', request.error);
-                        reject(request.error);
-                    };
-                });
-            } catch (e) {
-                console.error('❌ خطأ في deleteAllVideos:', e);
-            }
+            const db = await openDB();
+            return new Promise((resolve) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                store.clear().onsuccess = () => resolve();
+            });
         }
 
-        // ===== تحميل المستخدمين =====
+        // ===== تحميل البيانات =====
         function loadUsers() {
             const saved = localStorage.getItem('hasryat_users');
             if (saved) {
@@ -941,9 +867,7 @@
                             expiresAt: null
                         };
                     }
-                } catch (e) {
-                    console.error('❌ خطأ في تحميل المستخدمين:', e);
-                }
+                } catch (e) {}
             }
         }
 
@@ -951,11 +875,9 @@
             localStorage.setItem('hasryat_users', JSON.stringify(users));
         }
 
-        // ===== تحديث الواجهة =====
         async function loadData() {
             loadUsers();
             videos = await loadVideos();
-            console.log('📊 فيديوهات محملة:', videos.length);
             
             const savedUser = localStorage.getItem('hasryat_current_user');
             if (savedUser) {
@@ -963,6 +885,12 @@
                     const user = JSON.parse(savedUser);
                     if (users[user.email]) {
                         currentUser = users[user.email];
+                        if (currentUser.expiresAt && !currentUser.isDeveloper) {
+                            if (new Date(currentUser.expiresAt) < new Date()) {
+                                currentUser = null;
+                                localStorage.removeItem('hasryat_current_user');
+                            }
+                        }
                     }
                 } catch (e) {}
             }
@@ -991,13 +919,10 @@
             }
         }
 
-        // ===== تحديث الأزرار (الجزء الأهم) =====
         function updateButtons() {
             const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
             const totalButtons = Math.ceil(totalVideos / VIDEOS_PER_BUTTON);
-            
-            console.log('🔄 تحديث أزرار:', totalVideos, 'مقطع =', totalButtons, 'زر');
             
             document.getElementById('totalVideos').textContent = totalVideos;
             document.getElementById('totalButtons').textContent = totalButtons;
@@ -1013,28 +938,22 @@
             for (let i = 1; i <= totalButtons; i++) {
                 const start = (i - 1) * VIDEOS_PER_BUTTON + 1;
                 const end = Math.min(i * VIDEOS_PER_BUTTON, totalVideos);
-                const count = end - start + 1;
                 
                 const button = document.createElement('div');
                 button.className = 'page-button';
                 button.onclick = () => showVideosPage(i, start, end);
                 
                 button.innerHTML = `
-                    <div class="video-badge">${count} مقطع</div>
                     <div class="button-number">${i}</div>
                     <div class="button-range">${start} - ${end}</div>
-                    <div class="button-count">اضغط للعرض</div>
+                    <div class="button-count">${end-start+1} مقطع</div>
                 `;
                 
                 buttonsGrid.appendChild(button);
             }
-            
-            console.log('✅ تم عرض', totalButtons, 'زر');
         }
 
-        // ===== عرض صفحة فيديو =====
         function showVideosPage(btnNum, start, end) {
-            console.log('📄 عرض زر', btnNum, 'مقاطع', start, '-', end);
             const pageVideos = videos.slice(start-1, end);
             const grid = document.getElementById('videosGrid');
             
@@ -1066,15 +985,31 @@
             document.getElementById('videosPage').classList.add('active');
         }
 
+        // ===== تشغيل الفيديو (معدل) =====
         window.playVideo = (i) => {
             if (!currentUser) {
                 alert('❌ سجل دخول أولاً');
                 document.getElementById('loginModal').classList.add('active');
                 return;
             }
+            
             const v = videos[i];
             if (!v) return;
-            window.open(v.url, '_blank');
+            
+            const player = document.getElementById('videoPlayer');
+            const video = document.getElementById('playerVideo');
+            
+            video.src = v.url;
+            player.classList.add('active');
+            video.play();
+        };
+
+        window.closeVideo = () => {
+            const player = document.getElementById('videoPlayer');
+            const video = document.getElementById('playerVideo');
+            video.pause();
+            video.src = '';
+            player.classList.remove('active');
         };
 
         window.downloadVideo = (i) => {
@@ -1124,7 +1059,7 @@
                     name: f.name,
                     size: f.size,
                     url: base64,
-                    uploadedBy: currentUser?.email || 'unknown'
+                    uploadedBy: currentUser?.email || 'developer'
                 };
                 
                 await saveVideo(videoData);
@@ -1132,11 +1067,8 @@
             }
             
             videos = [...videos, ...newVideos];
-            console.log('✅ تم رفع', newVideos.length, 'مقطع');
             
             progress.style.display = 'none';
-            
-            // الرجوع وتحديث الأزرار
             document.getElementById('backBtn').click();
             updateButtons();
             
@@ -1193,7 +1125,7 @@
                 updateUI();
                 document.getElementById('loginModal').classList.remove('active');
             } else {
-                alert('❌ خطأ');
+                alert('❌ خطأ في البريد أو كلمة المرور');
             }
         };
 
@@ -1235,6 +1167,7 @@
             document.getElementById('videosPage').classList.remove('active');
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
+            closeVideo();
         };
 
         document.getElementById('showUploadBtn').onclick = () => {
@@ -1267,7 +1200,6 @@
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
         };
 
-        // بدء التشغيل
         loadData();
     </script>
 </body>
