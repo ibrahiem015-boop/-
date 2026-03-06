@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - تخزين ذاتي</title>
+    <title>حصريات - تخزين دائم</title>
     <style>
         * {
             margin: 0;
@@ -484,6 +484,18 @@
         .file-item .status.success {
             background: #2ed573;
             color: white;
+        }
+
+        .file-item .status.uploading {
+            background: #4ecdc4;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         .upload-submit-btn {
@@ -969,7 +981,7 @@
         }
         
         /* رسالة الحفظ التلقائي */
-        .auto-save-badge {
+        .save-badge {
             background: #4ecdc4;
             color: black;
             font-size: 11px;
@@ -978,20 +990,16 @@
             margin-right: 10px;
         }
         
-        .export-btn {
-            background: #333;
-            color: #4ecdc4;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 15px;
+        .storage-info {
             font-size: 11px;
-            cursor: pointer;
+            color: #888;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - تخزين ذاتي (لا يختفي شيء) ✨
+        ✨ حصريات - تخزين دائم (المقاطع تبقى للأبد) ✨
     </div>
 
     <div class="login-page" id="loginPage">
@@ -1003,10 +1011,10 @@
             
             <form id="loginForm">
                 <div class="input-group">
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="x@x1xxx.com" required>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+                    <input type="password" id="loginPassword" placeholder="كلمة المرور" value="1z5b" required>
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" id="rememberMe" checked>
@@ -1021,7 +1029,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
-                <span class="auto-save-badge" id="saveBadge" style="display: none;">💾 حفظ تلقائي</span>
+                <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
                 <span class="user-email" id="userEmailDisplay">
@@ -1046,16 +1054,17 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ تم التحميل - المقاطع محفوظة
+            ✅ مرحباً بك - المقاطع محفوظة بشكل دائم
+        </div>
+
+        <div class="storage-info" id="storageInfo">
+            💾 المساحة المستخدمة: <span id="storageUsed">0</span> MB
         </div>
 
         <div id="mainPage" class="main-page active">
             <!-- قائمة المطور - تظهر فقط للمطور -->
             <div class="developer-menu dev-only" id="devMenu">
-                <div class="dev-title">
-                    ⚙️ لوحة المطور
-                    <button class="export-btn" id="exportCodeBtn" style="float: left;">📥 تصدير الكود</button>
-                </div>
+                <div class="dev-title">⚙️ لوحة المطور</div>
                 <div class="dev-buttons">
                     <button class="dev-btn" id="createUserBtn">
                         <span>👤</span> حساب جديد
@@ -1072,7 +1081,7 @@
             <!-- زر رفع المقاطع - يظهر فقط للمطور -->
             <div class="upload-area dev-only" id="uploadArea">
                 <button class="upload-btn" id="showUploadPageBtn">
-                    <span>📦</span> رفع مقاطع (حفظ تلقائي)
+                    <span>📦</span> رفع مقاطع (تخزين دائم)
                 </button>
             </div>
 
@@ -1112,7 +1121,7 @@
 
         <!-- صفحة رفع المقاطع - تظهر فقط للمطور -->
         <div id="uploadPage" class="upload-page dev-only">
-            <h2>📦 رفع مقاطع (حفظ داخل الكود)</h2>
+            <h2>📦 رفع مقاطع (تخزين دائم)</h2>
             
             <div class="upload-form">
                 <label class="file-label" for="fileInput" id="fileLabel">
@@ -1124,7 +1133,11 @@
                 
                 <div class="files-list" id="filesList"></div>
                 
-                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>رفع جميع المقاطع</button>
+                <div id="uploadProgress" style="text-align: center; color: #4ecdc4; margin: 10px 0; display: none;">
+                    جاري تحويل المقاطع...
+                </div>
+                
+                <button class="upload-submit-btn" id="uploadSubmitBtn" disabled>رفع وحفظ المقاطع</button>
                 <div class="back-btn" id="backToMainBtn">← العودة للرئيسية</div>
             </div>
         </div>
@@ -1190,10 +1203,6 @@
     </div>
 
     <script>
-        // ========== هنا يتم تخزين المقاطع داخل الكود نفسه ==========
-        // هذه المصفوفة هي "الملف" الي يتم الحفظ فيه
-        let videos = [];
-
         // ========== حساب المطور ==========
         const DEVELOPER_EMAIL = 'x@x1xxx.com';
         const DEVELOPER_PASSWORD = '1z5b';
@@ -1210,30 +1219,49 @@
             }
         };
 
+        // ========== المتغيرات ==========
+        let videos = [];
+        let selectedFiles = [];
+        let currentUser = null;
+        let selectedForPublish = new Set();
+
         // ========== تحميل المقاطع المحفوظة ==========
         function loadVideos() {
-            const savedVideos = localStorage.getItem('hasryat_videos_data');
+            const savedVideos = localStorage.getItem('hasryat_permanent_videos');
             if (savedVideos) {
                 try {
                     videos = JSON.parse(savedVideos);
-                    showSaveBadge('تم تحميل المقاطع');
+                    showSaveBadge('تم تحميل ' + videos.length + ' مقطع');
                 } catch (e) {
                     videos = [];
                 }
             } else {
-                // إذا ماكو مقاطع محفوظة، نبدأ بمصفوفة فاضية
-                videos = [];
+                // نبدأ بمقاطع تجريبية تشتغل دايم
+                videos = [
+                    {
+                        id: 1,
+                        name: 'فيديو تجريبي 1',
+                        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                        date: '03-06'
+                    },
+                    {
+                        id: 2,
+                        name: 'فيديو تجريبي 2',
+                        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                        date: '03-05'
+                    }
+                ];
+                saveVideos();
             }
+            updateStorageInfo();
             renderVideos();
         }
 
-        // ========== حفظ المقاطع في localStorage ==========
-        function saveVideos(showMessage = true) {
-            localStorage.setItem('hasryat_videos_data', JSON.stringify(videos));
-            if (showMessage) {
-                showSaveBadge('تم الحفظ تلقائياً');
-            }
-            renderVideos();
+        // ========== حفظ المقاطع بشكل دائم ==========
+        function saveVideos() {
+            localStorage.setItem('hasryat_permanent_videos', JSON.stringify(videos));
+            showSaveBadge('تم الحفظ');
+            updateStorageInfo();
         }
 
         // ========== عرض رسالة الحفظ ==========
@@ -1241,48 +1269,38 @@
             const badge = document.getElementById('saveBadge');
             if (badge) {
                 badge.style.display = 'inline';
-                badge.textContent = '💾 ' + text;
+                badge.textContent = '✓ ' + text;
                 setTimeout(() => {
                     badge.style.display = 'none';
                 }, 2000);
             }
         }
 
-        // ========== تصدير الكود مع المقاطع ==========
-        function exportCodeWithVideos() {
-            // تحويل المقاطع إلى نص
-            const videosJson = JSON.stringify(videos, null, 2);
-            
-            // نصنع نافذة جديدة فيها الكود الكامل مع المقاطع
-            const codeWindow = window.open('', '_blank');
-            codeWindow.document.write(`
-                <html dir="rtl">
-                <head>
-                    <title>كود التطبيق مع المقاطع</title>
-                    <style>
-                        body { background: #1a1a1a; color: white; padding: 20px; font-family: monospace; }
-                        pre { background: #222; padding: 20px; border-radius: 10px; overflow: auto; max-height: 500px; }
-                        .copy-btn { background: #4ecdc4; color: black; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-                    </style>
-                </head>
-                <body>
-                    <h2>📥 كود التطبيق مع المقاطع المحفوظة</h2>
-                    <button class="copy-btn" onclick="copyCode()">📋 نسخ الكود</button>
-                    <pre id="codeBlock">// هذه هي المقاطع المحفوظة
-let videos = ${videosJson};
+        // ========== حساب المساحة ==========
+        function updateStorageInfo() {
+            try {
+                let totalSize = 0;
+                videos.forEach(video => {
+                    if (video.url && video.url.startsWith('data:')) {
+                        totalSize += video.url.length;
+                    }
+                });
+                
+                const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+                document.getElementById('storageUsed').textContent = sizeMB;
+            } catch (e) {
+                document.getElementById('storageUsed').textContent = '0';
+            }
+        }
 
-// باقي كود التطبيق طويل...
-// انسخ هذا الجزء وحطه في بداية الكود</pre>
-                    <script>
-                        function copyCode() {
-                            const code = document.getElementById('codeBlock').textContent;
-                            navigator.clipboard.writeText(code);
-                            alert('✅ تم النسخ');
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `);
+        // ========== تحويل الملف إلى Base64 ==========
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         // ========== عناصر DOM ==========
@@ -1340,6 +1358,7 @@ let videos = ${videosJson};
         const counter = document.getElementById('counter');
         const filesList = document.getElementById('filesList');
         const uploadSubmitBtn = document.getElementById('uploadSubmitBtn');
+        const uploadProgress = document.getElementById('uploadProgress');
 
         const subscriptionInfo = document.getElementById('subscriptionInfo');
         const subscriptionModal = document.getElementById('subscriptionModal');
@@ -1354,8 +1373,6 @@ let videos = ${videosJson};
         const exitModal = document.getElementById('exitModal');
         const confirmExit = document.getElementById('confirmExit');
         const cancelExit = document.getElementById('cancelExit');
-        
-        const exportCodeBtn = document.getElementById('exportCodeBtn');
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
@@ -1374,11 +1391,6 @@ let videos = ${videosJson};
                 }
             }
         }
-
-        // ========== المتغيرات ==========
-        let selectedFiles = [];
-        let currentUser = null;
-        let selectedForPublish = new Set();
 
         function showMainApp(user) {
             currentUser = user;
@@ -1607,7 +1619,7 @@ let videos = ${videosJson};
             
             if (confirm('هل أنت متأكد من حذف هذا المقطع؟')) {
                 videos.splice(index, 1);
-                saveVideos(); // حفظ بعد الحذف
+                saveVideos();
                 renderVideos();
             }
         };
@@ -1769,7 +1781,7 @@ let videos = ${videosJson};
             });
         }
 
-        // ========== رفع الملفات ==========
+        // ========== رفع الملفات بشكل دائم ==========
         function resetUploadForm() {
             selectedFiles = [];
             if (fileInput) fileInput.value = '';
@@ -1777,6 +1789,7 @@ let videos = ${videosJson};
             if (counter) counter.innerHTML = '0 مقطع';
             if (filesList) filesList.innerHTML = '';
             if (uploadSubmitBtn) uploadSubmitBtn.disabled = true;
+            if (uploadProgress) uploadProgress.style.display = 'none';
         }
 
         if (fileInput) {
@@ -1793,7 +1806,7 @@ let videos = ${videosJson};
             
             if (selectedFiles.length > 0) {
                 uploadSubmitBtn.disabled = false;
-                fileLabel.innerHTML = '✅ ' + selectedFiles.length;
+                fileLabel.innerHTML = '📦 ' + selectedFiles.length;
             } else {
                 uploadSubmitBtn.disabled = true;
                 fileLabel.innerHTML = '📁';
@@ -1803,8 +1816,9 @@ let videos = ${videosJson};
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.id = 'file-' + index;
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
                 fileItem.innerHTML = `
-                    <span>${index+1}. ${file.name.substring(0,30)}${file.name.length > 30 ? '...' : ''}</span>
+                    <span>${index+1}. ${file.name.substring(0,25)} (${sizeMB} MB)</span>
                     <div class="status pending" id="status-${index}">⏳</div>
                 `;
                 filesList.appendChild(fileItem);
@@ -1812,7 +1826,7 @@ let videos = ${videosJson};
         }
 
         if (uploadSubmitBtn) {
-            uploadSubmitBtn.addEventListener('click', function() {
+            uploadSubmitBtn.addEventListener('click', async function() {
                 if (!currentUser?.isDeveloper) {
                     alert('❌ هذه الصفحة للمطور فقط');
                     return;
@@ -1822,43 +1836,66 @@ let videos = ${videosJson};
                 
                 uploadSubmitBtn.disabled = true;
                 fileInput.disabled = true;
+                uploadProgress.style.display = 'block';
                 
+                // تحديث حالة الملفات
                 for (let i = 0; i < selectedFiles.length; i++) {
-                    const file = selectedFiles[i];
-                    const fileUrl = URL.createObjectURL(file);
-                    const today = new Date();
-                    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                    const day = today.getDate().toString().padStart(2, '0');
-                    
-                    videos.push({
-                        id: Date.now() + i,
-                        name: file.name,
-                        url: fileUrl,
-                        date: `${month}-${day}`
-                    });
-                    
                     const statusEl = document.getElementById('status-' + i);
                     if (statusEl) {
-                        statusEl.className = 'status success';
-                        statusEl.innerHTML = '✅';
+                        statusEl.className = 'status uploading';
+                        statusEl.innerHTML = '⏳';
                     }
                 }
                 
-                // حفظ المقاطع بعد الرفع
-                saveVideos(true);
-                
-                setTimeout(() => {
-                    mainPage.classList.add('active');
-                    uploadPage.classList.remove('active');
+                try {
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        const file = selectedFiles[i];
+                        
+                        // تحويل الملف إلى Base64
+                        const base64Data = await fileToBase64(file);
+                        
+                        const today = new Date();
+                        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                        const day = today.getDate().toString().padStart(2, '0');
+                        
+                        videos.push({
+                            id: Date.now() + i,
+                            name: file.name,
+                            url: base64Data,  // نخزن الـ Base64 بدل الـ URL المؤقت
+                            date: `${month}-${day}`,
+                            size: file.size
+                        });
+                        
+                        const statusEl = document.getElementById('status-' + i);
+                        if (statusEl) {
+                            statusEl.className = 'status success';
+                            statusEl.innerHTML = '✅';
+                        }
+                    }
+                    
+                    // حفظ كل المقاطع بشكل دائم
+                    saveVideos();
+                    
+                    uploadProgress.innerHTML = '✅ تم تحويل وحفظ جميع المقاطع!';
+                    
+                    setTimeout(() => {
+                        mainPage.classList.add('active');
+                        uploadPage.classList.remove('active');
+                        resetUploadForm();
+                        fileInput.disabled = false;
+                        
+                        welcomeAlert.style.display = 'block';
+                        welcomeAlert.innerHTML = '✅ تم حفظ المقاطع بشكل دائم!';
+                        setTimeout(() => {
+                            welcomeAlert.style.display = 'none';
+                        }, 3000);
+                    }, 1000);
+                    
+                } catch (error) {
+                    alert('خطأ في رفع الملف: ' + error.message);
                     resetUploadForm();
                     fileInput.disabled = false;
-                    
-                    welcomeAlert.style.display = 'block';
-                    welcomeAlert.innerHTML = '✅ تم رفع وحفظ المقاطع بنجاح!';
-                    setTimeout(() => {
-                        welcomeAlert.style.display = 'none';
-                    }, 3000);
-                }, 500);
+                }
             });
         }
 
@@ -1944,14 +1981,6 @@ let videos = ${videosJson};
             });
         }
 
-        if (exportCodeBtn) {
-            exportCodeBtn.addEventListener('click', () => {
-                if (currentUser?.isDeveloper) {
-                    exportCodeWithVideos();
-                }
-            });
-        }
-
         window.addEventListener('click', (e) => {
             if (e.target === exitModal) exitModal.classList.remove('active');
             if (e.target === subscriptionModal) subscriptionModal.classList.remove('active');
@@ -1971,7 +2000,7 @@ let videos = ${videosJson};
         });
 
         // ========== بدء التشغيل ==========
-        loadVideos(); // تحميل المقاطع المحفوظة
+        loadVideos();
         checkLogin();
     </script>
 </body>
