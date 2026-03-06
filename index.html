@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حصريات - رفع سريع + عرض تدريجي</title>
+    <title>حصريات - تحميل ذكي للمقاطع</title>
     <style>
         * {
             margin: 0;
@@ -733,6 +733,16 @@
             aspect-ratio: 1;
             position: relative;
             border: 1px solid #2a2a2a;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.3s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .thumbnail {
@@ -743,6 +753,11 @@
             justify-content: center;
             font-size: 40px;
             position: relative;
+            transition: transform 0.2s;
+        }
+
+        .video-card:hover .thumbnail {
+            transform: scale(1.05);
         }
 
         .video-date {
@@ -778,6 +793,12 @@
             color: white;
             font-size: 18px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .play-icon:hover {
+            transform: scale(1.2);
+            color: #4ecdc4;
         }
 
         .delete-icon {
@@ -785,9 +806,11 @@
             font-size: 16px;
             cursor: pointer;
             padding: 5px;
+            transition: transform 0.2s;
         }
 
         .delete-icon:hover {
+            transform: scale(1.2);
             opacity: 0.8;
         }
 
@@ -802,9 +825,11 @@
             font-size: 16px;
             cursor: pointer;
             padding: 5px;
+            transition: transform 0.2s;
         }
 
         .download-btn:hover {
+            transform: scale(1.2);
             opacity: 0.8;
         }
 
@@ -1168,32 +1193,97 @@
         }
         
         /* زر تحميل المزيد */
-        .load-more-btn {
+        .load-more-container {
             grid-column: 1/-1;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .load-more-btn {
             background: #222;
             color: #4ecdc4;
             border: 2px solid #4ecdc4;
             border-radius: 30px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 10px;
-            cursor: pointer;
+            padding: 15px 30px;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s;
         }
         
         .load-more-btn:hover {
             background: #2a2a2a;
+            transform: scale(1.05);
         }
         
         .load-more-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #4ecdc4;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* مؤشر تحميل الصفحة */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        
+        .loader-content {
+            text-align: center;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #4ecdc4;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        .loader-text {
+            color: white;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
+    <!-- مؤشر تحميل الصفحة -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">جاري تحميل التطبيق...</div>
+        </div>
+    </div>
+
     <div class="animated-header" id="animatedHeader" style="display: none;">
-        ✨ حصريات - عرض تدريجي (ما يعلق) ✨
+        ✨ حصريات - تحميل ذكي (ما يعلق) ✨
     </div>
 
     <!-- مؤشر الرفع في الخلفية -->
@@ -1216,7 +1306,7 @@
         <div class="login-card">
             <div class="login-header">
                 <h1>🚀</h1>
-                <p>حصريات - عرض تدريجي</p>
+                <p>حصريات - تحميل ذكي</p>
             </div>
             
             <form id="loginForm">
@@ -1273,7 +1363,7 @@
         <div class="navbar">
             <div class="logo">
                 حصريات
-                <span class="clean-badge" id="cleanBadge">📺 تدريجي</span>
+                <span class="clean-badge" id="cleanBadge">📺 ذكي</span>
                 <span class="save-badge" id="saveBadge" style="display: none;">✓ محفوظ</span>
             </div>
             <div class="user-area">
@@ -1310,7 +1400,7 @@
         </div>
 
         <div class="alert" id="welcomeAlert" style="background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; color: #2ed573; padding: 12px; border-radius: 30px; margin-bottom: 20px; text-align: center; display: none;">
-            ✅ مرحباً بك - عرض تدريجي للمقاطع
+            ✅ مرحباً بك - تحميل ذكي للمقاطع
         </div>
 
         <div id="mainPage" class="main-page active">
@@ -1343,8 +1433,10 @@
             </div>
 
             <div class="videos-grid" id="videosGrid"></div>
-            <div id="loadMoreContainer" style="display: none;">
-                <div class="load-more-btn" id="loadMoreBtn">عرض المزيد من المقاطع</div>
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <div class="load-more-btn" id="loadMoreBtn">
+                    <span>عرض المزيد من المقاطع</span>
+                </div>
             </div>
         </div>
 
@@ -1473,34 +1565,15 @@
     </div>
 
     <script>
-        // ========== تنظيف التخزين القديم ==========
-        (function cleanOldStorage() {
-            try {
-                localStorage.removeItem('hasryat_videos');
-                localStorage.removeItem('hasryat_videos_data');
-                localStorage.removeItem('hasryat_permanent_videos');
-                localStorage.removeItem('hasryat_users');
-                localStorage.removeItem('hasryat_current_user');
-                localStorage.removeItem('hasryat_users_new');
-                localStorage.removeItem('hasryat_current_user_new');
-                localStorage.removeItem('hasryat_users_final');
-                localStorage.removeItem('hasryat_current_user_final');
-                localStorage.removeItem('hasryat_users_public');
-                localStorage.removeItem('hasryat_current_user_public');
-                localStorage.removeItem('hasryat_users_fast');
-                localStorage.removeItem('hasryat_current_user_fast');
-                
-                const request = indexedDB.deleteDatabase('HasryatVideosDB');
-                const request2 = indexedDB.deleteDatabase('HasryatVideosDB_New');
-                const request3 = indexedDB.deleteDatabase('HasryatVideosDB_Final');
-                const request4 = indexedDB.deleteDatabase('HasryatVideosDB_Public');
-                const request5 = indexedDB.deleteDatabase('HasryatVideosDB_Fast');
-                
-                console.log('✅ تم تنظيف التخزين القديم');
-            } catch (e) {
-                console.log('تنظيف التخزين:', e);
-            }
-        })();
+        // ========== إخفاء مؤشر التحميل بعد تحميل الصفحة ==========
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('pageLoader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('pageLoader').style.display = 'none';
+                }, 500);
+            }, 500);
+        });
 
         // ========== حساب المطور ==========
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
@@ -1526,19 +1599,18 @@
         let selectedForPublish = new Set();
         let isUploading = false;
         let uploadStartTime = null;
-        let uploadCompleted = 0;
-        let uploadTotal = 0;
         
         // متغيرات العرض التدريجي
         let displayedVideos = 0;
-        const VIDEOS_PER_PAGE = 9; // 9 مقاطع كل مرة (3×3)
+        const VIDEOS_PER_PAGE = 6; // 6 مقاطع كل مرة (2×3)
+        let isLoadingMore = false;
         
-        // ========== IndexedDB جديد ==========
-        const DB_NAME = 'HasryatVideosDB_Smooth';
+        // ========== IndexedDB ==========
+        const DB_NAME = 'HasryatVideosDB_Smart';
         const STORE_NAME = 'videos';
         const DB_VERSION = 1;
 
-        // إعدادات الرفع السريع
+        // إعدادات الرفع
         const BATCH_SIZE = 10;
         const MAX_CONCURRENT = 5;
 
@@ -1673,12 +1745,12 @@
 
         // حفظ المستخدمين
         function saveUsers() {
-            localStorage.setItem('hasryat_users_smooth', JSON.stringify(users));
+            localStorage.setItem('hasryat_users_smart', JSON.stringify(users));
         }
 
         // تحميل المستخدمين
         function loadUsers() {
-            const savedUsers = localStorage.getItem('hasryat_users_smooth');
+            const savedUsers = localStorage.getItem('hasryat_users_smart');
             if (savedUsers) {
                 try {
                     users = JSON.parse(savedUsers);
@@ -1874,59 +1946,59 @@
             const start = displayedVideos;
             const end = Math.min(start + VIDEOS_PER_PAGE, videos.length);
             
-            for (let i = start; i < end; i++) {
-                const video = videos[i];
-                const videoCard = document.createElement('div');
-                videoCard.className = 'video-card';
-                
-                const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
-                
-                let actionsHtml = '';
-                
-                if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
-                    actionsHtml = `
-                        <div class="video-actions">
+            // استخدام requestAnimationFrame للتحميل التدريجي
+            requestAnimationFrame(() => {
+                for (let i = start; i < end; i++) {
+                    const video = videos[i];
+                    const videoCard = document.createElement('div');
+                    videoCard.className = 'video-card';
+                    videoCard.style.animationDelay = `${(i - start) * 0.05}s`;
+                    
+                    const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
+                    
+                    let actionsHtml = '';
+                    
+                    if (currentUser?.isDeveloper || video.uploadedBy === currentUser?.email) {
+                        actionsHtml = `
+                            <div class="video-actions">
+                                <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
+                                <span class="download-btn" onclick="event.stopPropagation(); downloadVideo('${video.url}', '${video.name}')">⬇️</span>
+                                ${currentUser?.isDeveloper ? `<span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${i})">🗑️</span>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        actionsHtml = `
                             <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
-                            <span class="download-btn" onclick="event.stopPropagation(); downloadVideo('${video.url}', '${video.name}')">⬇️</span>
-                            ${currentUser?.isDeveloper ? `<span class="delete-icon" onclick="event.stopPropagation(); deleteVideo('${video.id}', ${i})">🗑️</span>` : ''}
+                        `;
+                    }
+                    
+                    videoCard.innerHTML = `
+                        <div class="thumbnail">
+                            🎬
+                            <div class="video-date">${video.date || '??-??'}</div>
+                            ${isDevVideo ? '<span style="position:absolute; bottom:8px; right:8px; background:#ff6b6b; color:white; padding:2px 6px; border-radius:10px; font-size:9px;">مطور</span>' : ''}
+                        </div>
+                        <div class="video-footer">
+                            <span class="video-name">${video.name.substring(0, 15)}${video.name.length > 15 ? '...' : ''}</span>
+                            ${actionsHtml}
                         </div>
                     `;
-                } else {
-                    actionsHtml = `
-                        <span class="play-icon" onclick="event.stopPropagation(); playVideo('${video.url}', '${video.name}')">▶️</span>
-                    `;
+                    
+                    videosGrid.appendChild(videoCard);
                 }
                 
-                videoCard.innerHTML = `
-                    <div class="thumbnail">
-                        🎬
-                        <div class="video-date">${video.date || '??-??'}</div>
-                        ${isDevVideo ? '<span style="position:absolute; bottom:8px; right:8px; background:#ff6b6b; color:white; padding:2px 6px; border-radius:10px; font-size:9px;">مطور</span>' : ''}
-                    </div>
-                    <div class="video-footer">
-                        <span class="video-name">${video.name.substring(0, 15)}${video.name.length > 15 ? '...' : ''}</span>
-                        ${actionsHtml}
-                    </div>
-                `;
+                displayedVideos = end;
                 
-                videosGrid.appendChild(videoCard);
-            }
-            
-            displayedVideos = end;
-            
-            // إظهار/إخفاء زر "عرض المزيد"
-            if (displayedVideos < videos.length) {
-                document.getElementById('loadMoreContainer').style.display = 'block';
-                document.getElementById('loadMoreBtn').textContent = `عرض المزيد (${videos.length - displayedVideos} مقطع متبقي)`;
-            } else {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-            }
-            
-            totalVideosSpan.textContent = videos.length;
-            
-            if (publishPage.classList.contains('active')) {
-                renderPublishGrid();
-            }
+                // إظهار/إخفاء زر "عرض المزيد"
+                if (displayedVideos < videos.length) {
+                    document.getElementById('loadMoreContainer').style.display = 'block';
+                    document.getElementById('loadMoreBtn').innerHTML = `<span>عرض المزيد (${videos.length - displayedVideos} مقطع متبقي)</span>`;
+                } else {
+                    document.getElementById('loadMoreContainer').style.display = 'none';
+                }
+                
+                totalVideosSpan.textContent = videos.length;
+            });
         }
 
         // ========== عناصر DOM ==========
@@ -2091,7 +2163,7 @@
 
         // ========== التحقق من تسجيل الدخول ==========
         function checkLogin() {
-            const savedUser = localStorage.getItem('hasryat_current_user_smooth');
+            const savedUser = localStorage.getItem('hasryat_current_user_smart');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
@@ -2099,10 +2171,10 @@
                         currentUser = users[user.email];
                         showMainApp(currentUser);
                     } else {
-                        localStorage.removeItem('hasryat_current_user_smooth');
+                        localStorage.removeItem('hasryat_current_user_smart');
                     }
                 } catch (e) {
-                    localStorage.removeItem('hasryat_current_user_smooth');
+                    localStorage.removeItem('hasryat_current_user_smart');
                 }
             }
         }
@@ -2183,7 +2255,7 @@
                 currentUser = user;
                 
                 if (rememberMe.checked) {
-                    localStorage.setItem('hasryat_current_user_smooth', JSON.stringify({ email: user.email }));
+                    localStorage.setItem('hasryat_current_user_smart', JSON.stringify({ email: user.email }));
                 }
                 
                 showMainApp(user);
@@ -2552,8 +2624,6 @@
                 
                 uploadIndicator.style.display = 'block';
                 uploadStartTime = Date.now();
-                uploadTotal = selectedFiles.length;
-                uploadCompleted = 0;
                 
                 for (let i = 0; i < Math.min(selectedFiles.length, 30); i++) {
                     const statusEl = document.getElementById('status-' + i);
@@ -2631,7 +2701,15 @@
         // ========== زر تحميل المزيد ==========
         if (loadMoreBtn) {
             loadMoreBtn.addEventListener('click', () => {
-                renderVideos(false);
+                if (!isLoadingMore) {
+                    isLoadingMore = true;
+                    loadMoreBtn.innerHTML = '<span class="loading-spinner"></span> جاري التحميل...';
+                    
+                    setTimeout(() => {
+                        renderVideos(false);
+                        isLoadingMore = false;
+                    }, 300);
+                }
             });
         }
 
@@ -2726,7 +2804,7 @@
 
         if (confirmExit) {
             confirmExit.addEventListener('click', () => {
-                localStorage.removeItem('hasryat_current_user_smooth');
+                localStorage.removeItem('hasryat_current_user_smart');
                 currentUser = null;
                 animatedHeader.style.display = 'none';
                 mainApp.style.display = 'none';
