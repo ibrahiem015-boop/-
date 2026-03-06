@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حصريات - نظام الأزرار الذكية</title>
+    <title>حصريات - منصة الفيديو</title>
     <style>
         * {
             margin: 0;
@@ -57,6 +57,11 @@
             color: #4ecdc4;
             font-size: 14px;
             cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-badge:hover {
+            background: #444;
         }
 
         .dev-badge {
@@ -70,6 +75,11 @@
             justify-content: center;
             cursor: pointer;
             font-size: 20px;
+            transition: 0.3s;
+        }
+
+        .dev-badge:hover {
+            transform: scale(1.1);
         }
 
         .logout-btn {
@@ -81,6 +91,11 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
         }
 
         /* ===== الألوان المتحركة ===== */
@@ -101,6 +116,7 @@
             color: white;
             font-weight: bold;
             font-size: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         /* ===== إحصائيات ===== */
@@ -205,6 +221,7 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
             color: white;
             display: block;
         }
@@ -249,6 +266,12 @@
             display: block;
         }
 
+        .upload-page h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .file-label {
             display: flex;
             align-items: center;
@@ -260,7 +283,12 @@
             cursor: pointer;
             color: #4ecdc4;
             font-size: 60px;
+            transition: 0.3s;
             background: #222;
+        }
+
+        .file-label:hover {
+            background: rgba(78, 205, 196, 0.1);
         }
 
         #fileInput {
@@ -292,6 +320,14 @@
             font-size: 13px;
         }
 
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item .size {
+            color: #888;
+        }
+
         .upload-action-btn {
             width: 100%;
             padding: 18px;
@@ -318,6 +354,10 @@
             padding: 10px;
         }
 
+        .back-btn:hover {
+            color: #4ecdc4;
+        }
+
         /* ===== مؤشر التحميل ===== */
         .upload-progress {
             position: fixed;
@@ -330,6 +370,7 @@
             padding: 20px;
             display: none;
             z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
         .progress-header {
@@ -410,6 +451,7 @@
             overflow: hidden;
             transition: 0.3s;
             border: 1px solid #333;
+            cursor: pointer;
         }
 
         .video-card:hover {
@@ -482,11 +524,21 @@
             border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: 0.3s;
         }
 
         .play-btn {
             background: #4ecdc4;
             color: black;
+        }
+
+        .play-btn:hover {
+            background: #ff6b6b;
+            color: white;
         }
 
         .download-btn {
@@ -495,14 +547,20 @@
             border: 1px solid #4ecdc4;
         }
 
+        .download-btn:hover {
+            background: #4ecdc4;
+            color: black;
+        }
+
         .download-btn.dev-only {
             display: none;
         }
 
         .download-btn.dev-only.visible {
-            display: block;
+            display: flex;
         }
 
+        /* ===== عناصر المطور فقط ===== */
         .dev-only {
             display: none;
         }
@@ -511,7 +569,15 @@
             display: block;
         }
 
-        /* ===== نوافذ تسجيل الدخول ===== */
+        .dev-only-inline {
+            display: none;
+        }
+
+        .dev-only-inline.visible {
+            display: inline-flex;
+        }
+
+        /* ===== نوافذ ===== */
         .modal {
             display: none;
             position: fixed;
@@ -538,6 +604,11 @@
             text-align: center;
         }
 
+        .modal-content h2 {
+            color: #4ecdc4;
+            margin-bottom: 20px;
+        }
+
         .modal-content input {
             width: 100%;
             padding: 12px 15px;
@@ -546,6 +617,22 @@
             border-radius: 25px;
             background: #333;
             color: white;
+            font-size: 14px;
+        }
+
+        .modal-content input:focus {
+            outline: 2px solid #4ecdc4;
+        }
+
+        .modal-content select {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 25px;
+            background: #333;
+            color: white;
+            font-size: 14px;
         }
 
         .modal-buttons {
@@ -561,6 +648,8 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
         .modal-btn.primary {
@@ -568,9 +657,17 @@
             color: white;
         }
 
+        .modal-btn.primary:hover {
+            transform: scale(1.02);
+        }
+
         .modal-btn.secondary {
             background: #333;
             color: white;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #444;
         }
 
         .modal-link {
@@ -579,6 +676,17 @@
             margin-top: 15px;
             display: block;
             font-size: 13px;
+        }
+
+        .modal-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -595,39 +703,48 @@
         <div class="progress-details" id="progressDetails"></div>
     </div>
 
-    <!-- نوافذ تسجيل الدخول -->
+    <!-- نافذة تسجيل الدخول -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <h2 style="color:#4ecdc4;">🔐 تسجيل الدخول</h2>
+            <h2>🔐 تسجيل الدخول</h2>
             <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
             <input type="password" id="loginPassword" placeholder="كلمة المرور">
+            <div class="error-message" id="loginError"></div>
             <div class="modal-buttons">
                 <button class="modal-btn primary" id="loginSubmit">دخول</button>
                 <button class="modal-btn secondary" id="cancelLogin">إلغاء</button>
             </div>
-            <span class="modal-link" id="showRegisterLink">إنشاء حساب جديد</span>
         </div>
     </div>
 
-    <div class="modal" id="registerModal">
+    <!-- نافذة إنشاء حساب (للمطور فقط) -->
+    <div class="modal" id="createUserModal">
         <div class="modal-content">
-            <h2 style="color:#4ecdc4;">✨ إنشاء حساب</h2>
-            <input type="text" id="regName" placeholder="الاسم">
-            <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-            <input type="password" id="regPassword" placeholder="كلمة المرور">
-            <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
+            <h2>✨ إنشاء حساب مستخدم</h2>
+            <input type="text" id="newName" placeholder="الاسم">
+            <input type="email" id="newEmail" placeholder="البريد الإلكتروني">
+            <input type="text" id="newPassword" placeholder="كلمة المرور (ستظهر للمستخدم)">
+            <select id="subscriptionDays">
+                <option value="30">30 يوم</option>
+                <option value="60">60 يوم</option>
+                <option value="90">90 يوم</option>
+                <option value="180">180 يوم</option>
+                <option value="365">سنة كاملة (365 يوم)</option>
+                <option value="0">غير محدود</option>
+            </select>
+            <div class="error-message" id="createError"></div>
             <div class="modal-buttons">
-                <button class="modal-btn primary" id="registerSubmit">تسجيل</button>
-                <button class="modal-btn secondary" id="cancelRegister">إلغاء</button>
+                <button class="modal-btn primary" id="createUserSubmit">إنشاء</button>
+                <button class="modal-btn secondary" id="cancelCreate">إلغاء</button>
             </div>
-            <span class="modal-link" id="showLoginLink">تسجيل الدخول</span>
         </div>
     </div>
 
+    <!-- نافذة تأكيد الخروج -->
     <div class="modal" id="exitModal">
         <div class="modal-content">
             <h3 style="color:#ff6b6b;">⚠️ تأكيد الخروج</h3>
-            <p style="color:#888;">هل أنت متأكد؟</p>
+            <p style="color:#888; margin:15px 0;">هل أنت متأكد من الخروج؟</p>
             <div class="modal-buttons">
                 <button class="modal-btn primary" id="confirmExit">نعم</button>
                 <button class="modal-btn secondary" id="cancelExit">لا</button>
@@ -636,19 +753,22 @@
     </div>
 
     <div class="container">
+        <!-- الشريط العلوي المتحرك -->
         <div class="animated-header">
-            ✨ حصريات - نظام الأزرار الذكية ✨
+            ✨ حصريات - منصة الفيديو ✨
         </div>
 
+        <!-- شريط التنقل -->
         <div class="navbar">
             <div class="logo">🎬 حصريات</div>
             <div class="user-area">
-                <span class="user-badge" id="userName">تسجيل الدخول</span>
-                <div class="dev-badge" id="devBadge" style="display: none;">⚙️</div>
-                <button class="logout-btn" id="logoutBtn" style="display: none;">🚪</button>
+                <span class="user-badge" id="userName" onclick="showLoginModal()">تسجيل الدخول</span>
+                <div class="dev-badge" id="devBadge" style="display: none;" onclick="showDeveloperMenu()">⚙️</div>
+                <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="showExitModal()">🚪</button>
             </div>
         </div>
 
+        <!-- إحصائيات -->
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-value" id="totalVideos">0</div>
@@ -664,29 +784,36 @@
             </div>
         </div>
 
+        <!-- زر الرفع (للمطور فقط) -->
         <div class="upload-section dev-only" id="uploadSection">
             <button class="upload-btn" id="showUploadBtn">
                 <span>📦</span> رفع مقاطع جديدة
             </button>
         </div>
 
+        <!-- رأس الأزرار -->
         <div class="buttons-header">
             <span class="buttons-title">📌 الأزرار المتاحة</span>
             <span class="total-badge" id="buttonsCount">0 زر</span>
         </div>
 
+        <!-- شبكة الأزرار -->
         <div class="buttons-grid" id="buttonsGrid"></div>
 
+        <!-- صفحة الرفع -->
         <div class="upload-page" id="uploadPage">
             <h2>📦 رفع مقاطع جديدة</h2>
             <label class="file-label" for="fileInput" id="fileLabel">📁</label>
             <input type="file" id="fileInput" accept="video/*" multiple>
+            
             <div class="counter" id="counter">0 مقطع</div>
             <div class="files-list" id="filesList"></div>
+            
             <button class="upload-action-btn" id="uploadBtn" disabled>بدء الرفع</button>
             <div class="back-btn" id="backBtn">← العودة للرئيسية</div>
         </div>
 
+        <!-- صفحة عرض المقاطع -->
         <div class="videos-page" id="videosPage">
             <div class="page-header">
                 <h2 id="pageTitle"></h2>
@@ -697,38 +824,151 @@
     </div>
 
     <script>
-        // ===== إعدادات =====
+        // ===== إعدادات المطور =====
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
+        const DEVELOPER_NAME = 'مدير النظام';
         const VIDEOS_PER_BUTTON = 10;
 
+        // ===== المستخدمين =====
         let users = {
             [DEVELOPER_EMAIL]: {
                 email: DEVELOPER_EMAIL,
-                name: 'مدير النظام',
+                name: DEVELOPER_NAME,
                 password: DEVELOPER_PASSWORD,
-                isDeveloper: true
+                isDeveloper: true,
+                expiresAt: null,
+                createdAt: new Date().toISOString()
             }
         };
 
+        // ===== المتغيرات =====
         let currentUser = null;
         let videos = [];
         let selectedFiles = [];
 
         // ===== تحميل البيانات =====
         function loadData() {
-            const saved = localStorage.getItem('hasryat_videos');
-            videos = saved ? JSON.parse(saved) : [];
+            // تحميل المستخدمين
+            const savedUsers = localStorage.getItem('hasryat_users');
+            if (savedUsers) {
+                try {
+                    users = JSON.parse(savedUsers);
+                    if (!users[DEVELOPER_EMAIL]) {
+                        users[DEVELOPER_EMAIL] = {
+                            email: DEVELOPER_EMAIL,
+                            name: DEVELOPER_NAME,
+                            password: DEVELOPER_PASSWORD,
+                            isDeveloper: true,
+                            expiresAt: null,
+                            createdAt: new Date().toISOString()
+                        };
+                    }
+                } catch (e) {}
+            }
+            
+            // تحميل المقاطع
+            const savedVideos = localStorage.getItem('hasryat_videos');
+            if (savedVideos) {
+                try {
+                    videos = JSON.parse(savedVideos);
+                } catch (e) {
+                    videos = [];
+                }
+            }
+            
+            // تحميل المستخدم الحالي
+            const savedUser = localStorage.getItem('hasryat_current_user');
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    if (users[user.email]) {
+                        currentUser = users[user.email];
+                        // التحقق من انتهاء الاشتراك
+                        if (currentUser.expiresAt && !currentUser.isDeveloper) {
+                            const expiryDate = new Date(currentUser.expiresAt);
+                            if (expiryDate < new Date()) {
+                                currentUser = null;
+                                localStorage.removeItem('hasryat_current_user');
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+            
+            updateUI();
             updateButtons();
         }
 
         function saveData() {
+            localStorage.setItem('hasryat_users', JSON.stringify(users));
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
-            updateButtons();
         }
 
-        // ===== تحديث الأزرار =====
+        // ===== تحديث واجهة المستخدم =====
+        function updateUI() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('logoutBtn').style.display = 'block';
+                
+                if (currentUser.isDeveloper) {
+                    document.getElementById('devBadge').style.display = 'flex';
+                    document.querySelectorAll('.dev-only').forEach(el => {
+                        el.classList.add('visible');
+                    });
+                    document.querySelectorAll('.dev-only-inline').forEach(el => {
+                        el.classList.add('visible');
+                    });
+                } else {
+                    document.getElementById('devBadge').style.display = 'none';
+                    document.querySelectorAll('.dev-only').forEach(el => {
+                        el.classList.remove('visible');
+                    });
+                    document.querySelectorAll('.dev-only-inline').forEach(el => {
+                        el.classList.remove('visible');
+                    });
+                }
+            } else {
+                document.getElementById('userName').textContent = 'تسجيل الدخول';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('devBadge').style.display = 'none';
+                document.querySelectorAll('.dev-only').forEach(el => {
+                    el.classList.remove('visible');
+                });
+                document.querySelectorAll('.dev-only-inline').forEach(el => {
+                    el.classList.remove('visible');
+                });
+            }
+        }
+
+        // ===== دوال النوافذ =====
+        function showLoginModal() {
+            if (!currentUser) {
+                document.getElementById('loginModal').classList.add('active');
+            }
+        }
+
+        function showDeveloperMenu() {
+            document.getElementById('createUserModal').classList.add('active');
+        }
+
+        function showExitModal() {
+            document.getElementById('exitModal').classList.add('active');
+        }
+
+        // ===== التحقق من تسجيل الدخول قبل تشغيل الفيديو =====
+        function checkLoginBeforePlay(callback) {
+            if (currentUser) {
+                callback();
+            } else {
+                alert('❌ يجب تسجيل الدخول أولاً لمشاهدة المقاطع');
+                showLoginModal();
+            }
+        }
+
+        // ===== توليد الأزرار =====
         function updateButtons() {
+            const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
             const totalButtons = Math.ceil(totalVideos / VIDEOS_PER_BUTTON);
             
@@ -736,53 +976,82 @@
             document.getElementById('totalButtons').textContent = totalButtons;
             document.getElementById('buttonsCount').textContent = totalButtons + ' زر';
             
-            const grid = document.getElementById('buttonsGrid');
-            grid.innerHTML = '';
+            buttonsGrid.innerHTML = '';
+            
+            if (totalButtons === 0) {
+                buttonsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">📭 لا توجد أزرار بعد</div>';
+                return;
+            }
             
             for (let i = 1; i <= totalButtons; i++) {
                 const start = (i - 1) * VIDEOS_PER_BUTTON + 1;
                 const end = Math.min(i * VIDEOS_PER_BUTTON, totalVideos);
+                const count = end - start + 1;
                 
-                const btn = document.createElement('div');
-                btn.className = 'page-button';
-                btn.onclick = () => showVideos(i, start, end);
-                btn.innerHTML = `
+                const button = document.createElement('div');
+                button.className = 'page-button';
+                button.onclick = () => {
+                    checkLoginBeforePlay(() => showVideosPage(i, start, end));
+                };
+                
+                button.innerHTML = `
                     <div class="button-number">${i}</div>
                     <div class="button-range">${start} - ${end}</div>
-                    <div class="button-count">${end-start+1} مقطع</div>
+                    <div class="button-count">${count} مقطع</div>
                 `;
-                grid.appendChild(btn);
+                
+                buttonsGrid.appendChild(button);
             }
         }
 
-        // ===== عرض المقاطع =====
-        function showVideos(btnNum, start, end) {
-            const pageVideos = videos.slice(start-1, end);
-            const grid = document.getElementById('videosGrid');
+        // ===== عرض صفحة المقاطع =====
+        function showVideosPage(buttonNum, start, end) {
+            const pageVideos = videos.slice(start - 1, end);
+            const videosGrid = document.getElementById('videosGrid');
+            const pageTitle = document.getElementById('pageTitle');
             
-            document.getElementById('pageTitle').textContent = `📄 الزر ${btnNum} - مقاطع ${start} إلى ${end}`;
-            grid.innerHTML = '';
+            pageTitle.textContent = `📄 الزر ${buttonNum} - مقاطع ${start} إلى ${end}`;
+            videosGrid.innerHTML = '';
             
-            pageVideos.forEach((v, i) => {
-                const idx = start + i;
-                grid.innerHTML += `
-                    <div class="video-card">
-                        <div class="video-thumb">
-                            🎬
-                            <span class="video-number">#${idx}</span>
+            pageVideos.forEach((video, index) => {
+                const videoIndex = start + index;
+                const isDevVideo = video.uploadedBy === DEVELOPER_EMAIL;
+                
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                
+                let actionsHtml = '';
+                
+                if (currentUser?.isDeveloper) {
+                    actionsHtml = `
+                        <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
+                        <button class="action-btn download-btn" onclick="downloadVideo(${videoIndex - 1})">⬇️ تحميل</button>
+                    `;
+                } else {
+                    actionsHtml = `
+                        <button class="action-btn play-btn" onclick="playVideo(${videoIndex - 1})">▶️ تشغيل</button>
+                    `;
+                }
+                
+                videoCard.innerHTML = `
+                    <div class="video-thumb">
+                        🎬
+                        <span class="video-number">#${videoIndex}</span>
+                        ${isDevVideo ? '<span class="dev-badge-small">مطور</span>' : ''}
+                    </div>
+                    <div class="video-info">
+                        <div class="video-name">${video.name || `مقطع ${videoIndex}`}</div>
+                        <div class="video-meta">
+                            <span>${video.size ? (video.size/1024/1024).toFixed(2) + ' MB' : '?? MB'}</span>
+                            <span>${video.date || '06-03'}</span>
                         </div>
-                        <div class="video-info">
-                            <div class="video-name">${v.name}</div>
-                            <div class="video-meta">
-                                <span>${(v.size/1024/1024).toFixed(2)} MB</span>
-                            </div>
-                            <div class="video-actions">
-                                <button class="action-btn play-btn" onclick="playVideo(${idx-1})">▶️</button>
-                                ${currentUser?.isDeveloper ? `<button class="action-btn download-btn" onclick="downloadVideo(${idx-1})">⬇️</button>` : ''}
-                            </div>
+                        <div class="video-actions">
+                            ${actionsHtml}
                         </div>
                     </div>
                 `;
+                
+                videosGrid.appendChild(videoCard);
             });
             
             document.querySelector('.buttons-header').style.display = 'none';
@@ -790,142 +1059,286 @@
             document.getElementById('videosPage').classList.add('active');
         }
 
-        // ===== تشغيل فيديو =====
-        window.playVideo = (i) => {
-            const v = videos[i];
-            if (!v) return;
-            const w = window.open('', '_blank');
-            w.document.write(`
-                <html><body style="margin:0;background:#000">
-                <video src="${v.url}" controls autoplay style="width:100%;height:100vh"></video>
-                </body></html>
-            `);
-        };
-
-        window.downloadVideo = (i) => {
-            if (!currentUser?.isDeveloper) return alert('❌ للمطور فقط');
-            const v = videos[i];
-            const a = document.createElement('a');
-            a.href = v.url;
-            a.download = v.name;
-            a.click();
-        };
-
-        // ===== رفع ملفات =====
-        document.getElementById('fileInput').onchange = function(e) {
-            selectedFiles = Array.from(this.files);
-            document.getElementById('counter').textContent = selectedFiles.length + ' مقطع';
-            document.getElementById('uploadBtn').disabled = false;
-            
-            const list = document.getElementById('filesList');
-            list.innerHTML = '';
-            selectedFiles.forEach((f, i) => {
-                list.innerHTML += `<div class="file-item">${i+1}. ${f.name} <span>${(f.size/1024/1024).toFixed(2)} MB</span></div>`;
+        // ===== تشغيل الفيديو =====
+        window.playVideo = function(index) {
+            checkLoginBeforePlay(() => {
+                const video = videos[index];
+                if (!video) return;
+                
+                const videoWindow = window.open('', '_blank');
+                videoWindow.document.write(`
+                    <html dir="rtl">
+                    <head>
+                        <title>${video.name || 'مقطع'}</title>
+                        <style>
+                            body { margin:0; background:#000; display:flex; align-items:center; justify-content:center; height:100vh; }
+                            video { max-width:100%; max-height:100%; }
+                            .back-btn { position:absolute; top:20px; right:20px; color:white; text-decoration:none; background:#333; padding:10px 20px; border-radius:30px; }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="back-btn" onclick="window.close()">← رجوع</button>
+                        <video controls autoplay>
+                            <source src="${video.url || '#'}" type="video/mp4">
+                        </video>
+                    </body>
+                    </html>
+                `);
             });
         };
 
-        document.getElementById('uploadBtn').onclick = async function() {
-            this.disabled = true;
+        // ===== تحميل الفيديو (للمطور فقط) =====
+        window.downloadVideo = function(index) {
+            if (!currentUser?.isDeveloper) {
+                alert('❌ التحميل متاح فقط للمطور');
+                return;
+            }
+            
+            const video = videos[index];
+            if (!video) return;
+            
+            const a = document.createElement('a');
+            a.href = video.url || '#';
+            a.download = video.name || 'video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+
+        // ===== رفع الملفات =====
+        async function uploadFiles(files) {
             const progress = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressDetails = document.getElementById('progressDetails');
+            
             progress.style.display = 'block';
             
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const f = selectedFiles[i];
-                const p = Math.round(((i+1)/selectedFiles.length)*100);
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const percent = Math.round(((i + 1) / files.length) * 100);
                 
-                document.getElementById('progressFill').style.width = p + '%';
-                document.getElementById('progressPercent').textContent = p + '%';
-                document.getElementById('progressDetails').textContent = `جاري رفع ${f.name} (${i+1}/${selectedFiles.length})`;
+                progressFill.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
+                progressDetails.textContent = `جاري رفع ${file.name} (${i+1}/${files.length})`;
                 
                 await new Promise(r => setTimeout(r, 200));
                 
                 const reader = new FileReader();
-                const base64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(f); });
+                const base64 = await new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
                 
                 videos.push({
-                    name: f.name,
-                    size: f.size,
-                    url: base64
+                    name: file.name,
+                    size: file.size,
+                    date: new Date().toLocaleDateString('ar-EG').replace(/\//g, '-'),
+                    url: base64,
+                    uploadedBy: currentUser?.email || 'unknown'
                 });
             }
             
+            progressFill.style.width = '100%';
+            progressPercent.textContent = '100%';
+            progressDetails.textContent = '✅ تم الرفع بنجاح!';
+            
             saveData();
-            progress.style.display = 'none';
-            document.getElementById('backBtn').click();
-        };
+            
+            setTimeout(() => {
+                progress.style.display = 'none';
+            }, 1500);
+            
+            return files.length;
+        }
 
-        // ===== تسجيل الدخول =====
-        document.getElementById('userName').onclick = () => !currentUser && document.getElementById('loginModal').classList.add('active');
-        document.getElementById('showRegisterLink').onclick = () => { document.getElementById('loginModal').classList.remove('active'); document.getElementById('registerModal').classList.add('active'); };
-        document.getElementById('showLoginLink').onclick = () => { document.getElementById('registerModal').classList.remove('active'); document.getElementById('loginModal').classList.add('active'); };
-        
+        // ===== أحداث النوافذ =====
         document.getElementById('loginSubmit').onclick = () => {
-            const e = document.getElementById('loginEmail').value;
-            const p = document.getElementById('loginPassword').value;
-            if (users[e] && users[e].password === p) {
-                currentUser = users[e];
-                localStorage.setItem('hasryat_user', JSON.stringify({email:e}));
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('logoutBtn').style.display = 'block';
-                if (currentUser.isDeveloper) {
-                    document.getElementById('devBadge').style.display = 'flex';
-                    document.querySelectorAll('.dev-only').forEach(el => el.classList.add('visible'));
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const error = document.getElementById('loginError');
+            
+            if (!email || !password) {
+                error.textContent = '❌ الرجاء إدخال البريد وكلمة المرور';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (users[email] && users[email].password === password) {
+                // التحقق من الاشتراك
+                if (users[email].expiresAt && !users[email].isDeveloper) {
+                    const expiryDate = new Date(users[email].expiresAt);
+                    if (expiryDate < new Date()) {
+                        error.textContent = '❌ انتهت صلاحية الاشتراك';
+                        error.style.display = 'block';
+                        return;
+                    }
                 }
+                
+                currentUser = users[email];
+                localStorage.setItem('hasryat_current_user', JSON.stringify({ email }));
+                updateUI();
                 document.getElementById('loginModal').classList.remove('active');
-            } else alert('❌ خطأ في البيانات');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                error.style.display = 'none';
+            } else {
+                error.textContent = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة';
+                error.style.display = 'block';
+            }
         };
 
-        document.getElementById('registerSubmit').onclick = () => {
-            const n = document.getElementById('regName').value;
-            const e = document.getElementById('regEmail').value;
-            const p = document.getElementById('regPassword').value;
-            const c = document.getElementById('regConfirm').value;
-            if (!n||!e||!p||!c) return alert('❌ املأ كل الحقول');
-            if (p !== c) return alert('❌ كلمة المرور غير متطابقة');
-            if (users[e]) return alert('❌ البريد موجود');
-            users[e] = { email:e, name:n, password:p, isDeveloper:false };
-            localStorage.setItem('hasryat_users', JSON.stringify(users));
-            alert('✅ تم التسجيل');
-            document.getElementById('registerModal').classList.remove('active');
+        document.getElementById('createUserSubmit').onclick = () => {
+            const name = document.getElementById('newName').value;
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const days = parseInt(document.getElementById('subscriptionDays').value);
+            const error = document.getElementById('createError');
+            
+            if (!name || !email || !password) {
+                error.textContent = '❌ الرجاء ملء جميع الحقول';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (users[email]) {
+                error.textContent = '❌ هذا البريد موجود مسبقاً';
+                error.style.display = 'block';
+                return;
+            }
+            
+            let expiresAt = null;
+            if (days > 0) {
+                expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + days);
+            }
+            
+            users[email] = {
+                email: email,
+                name: name,
+                password: password,
+                isDeveloper: false,
+                expiresAt: expiresAt ? expiresAt.toISOString() : null,
+                createdAt: new Date().toISOString()
+            };
+            
+            saveData();
+            
+            document.getElementById('createUserModal').classList.remove('active');
+            document.getElementById('newName').value = '';
+            document.getElementById('newEmail').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('subscriptionDays').value = '30';
+            error.style.display = 'none';
+            
+            alert(`✅ تم إنشاء حساب للمستخدم:\nالبريد: ${email}\nكلمة المرور: ${password}\nالاشتراك: ${days > 0 ? days + ' يوم' : 'غير محدود'}`);
         };
 
-        document.getElementById('logoutBtn').onclick = () => document.getElementById('exitModal').classList.add('active');
+        // ===== أزرار الإلغاء =====
+        document.getElementById('cancelLogin').onclick = () => {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        };
+
+        document.getElementById('cancelCreate').onclick = () => {
+            document.getElementById('createUserModal').classList.remove('active');
+            document.getElementById('newName').value = '';
+            document.getElementById('newEmail').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('subscriptionDays').value = '30';
+            document.getElementById('createError').style.display = 'none';
+        };
+
         document.getElementById('confirmExit').onclick = () => {
-            localStorage.removeItem('hasryat_user');
+            localStorage.removeItem('hasryat_current_user');
             currentUser = null;
-            document.getElementById('userName').textContent = 'تسجيل الدخول';
-            document.getElementById('logoutBtn').style.display = 'none';
-            document.getElementById('devBadge').style.display = 'none';
-            document.querySelectorAll('.dev-only').forEach(el => el.classList.remove('visible'));
+            updateUI();
+            document.getElementById('exitModal').classList.remove('active');
+            document.getElementById('videosPage').classList.remove('active');
+            document.querySelector('.buttons-header').style.display = 'flex';
+            document.getElementById('buttonsGrid').style.display = 'grid';
+        };
+
+        document.getElementById('cancelExit').onclick = () => {
             document.getElementById('exitModal').classList.remove('active');
         };
 
-        // ===== أزرار التنقل =====
+        // ===== أحداث الرفع =====
         document.getElementById('showUploadBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'none';
             document.getElementById('buttonsGrid').style.display = 'none';
             document.getElementById('uploadPage').classList.add('active');
         };
+
         document.getElementById('backBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('uploadPage').classList.remove('active');
-            document.getElementById('fileInput').value = '';
-            document.getElementById('filesList').innerHTML = '';
-            document.getElementById('counter').textContent = '0 مقطع';
+            resetUploadForm();
         };
+
         document.getElementById('closeVideosPage').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'flex';
             document.getElementById('buttonsGrid').style.display = 'grid';
             document.getElementById('videosPage').classList.remove('active');
         };
 
-        // ===== إغلاق النوافذ =====
-        document.getElementById('cancelLogin').onclick = () => document.getElementById('loginModal').classList.remove('active');
-        document.getElementById('cancelRegister').onclick = () => document.getElementById('registerModal').classList.remove('active');
-        document.getElementById('cancelExit').onclick = () => document.getElementById('exitModal').classList.remove('active');
-        window.onclick = (e) => { if (e.target.classList.contains('modal')) e.target.classList.remove('active'); };
+        document.getElementById('fileInput').onchange = function(e) {
+            const files = Array.from(this.files);
+            selectedFiles = files;
+            
+            document.getElementById('counter').textContent = files.length + ' مقطع';
+            document.getElementById('uploadBtn').disabled = files.length === 0;
+            
+            const filesList = document.getElementById('filesList');
+            filesList.innerHTML = '';
+            
+            files.forEach((file, i) => {
+                filesList.innerHTML += `
+                    <div class="file-item">
+                        <span>${i+1}. ${file.name}</span>
+                        <span class="size">${(file.size/1024/1024).toFixed(2)} MB</span>
+                    </div>
+                `;
+            });
+        };
 
+        document.getElementById('uploadBtn').onclick = async function() {
+            if (selectedFiles.length === 0) return;
+            
+            this.disabled = true;
+            const count = await uploadFiles(selectedFiles);
+            
+            document.querySelector('.buttons-header').style.display = 'flex';
+            document.getElementById('buttonsGrid').style.display = 'grid';
+            document.getElementById('uploadPage').classList.remove('active');
+            resetUploadForm();
+            
+            alert(`✅ تم رفع ${count} مقاطع بنجاح!`);
+        };
+
+        function resetUploadForm() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('counter').textContent = '0 مقطع';
+            document.getElementById('filesList').innerHTML = '';
+            document.getElementById('uploadBtn').disabled = true;
+            selectedFiles = [];
+        }
+
+        // ===== إغلاق النوافذ عند الضغط خارجها =====
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        };
+
+        // ===== منع النسخ =====
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
+
+        // ===== بدء التشغيل =====
         loadData();
     </script>
 </body>
