@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حصريات - منصة الفيديو</title>
+    <title>حصريات - 30 زر جاهز</title>
     <style>
         * {
             margin: 0;
@@ -235,6 +235,12 @@
             transition: all 0.3s;
             color: white;
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .page-button:hover {
@@ -356,6 +362,12 @@
             padding: 20px;
             display: none;
             z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         .progress-header {
@@ -655,7 +667,6 @@
         </div>
     </div>
 
-    <!-- نافذة تأكيد حذف الكل -->
     <div class="modal" id="deleteAllModal">
         <div class="modal-content">
             <h3 style="color:#ff6b6b;">⚠️ حذف جميع المقاطع</h3>
@@ -680,7 +691,7 @@
 
     <div class="container">
         <div class="animated-header">
-            ✨ حصريات - منصة الفيديو ✨
+            ✨ حصريات - 30 زر جاهز ✨
         </div>
 
         <div class="navbar">
@@ -707,7 +718,6 @@
             </div>
         </div>
 
-        <!-- أزرار المطور -->
         <div class="dev-actions dev-only" id="devActions">
             <button class="dev-action-btn" id="refreshBtn">
                 <span>🔄</span> تحديث الأزرار
@@ -768,7 +778,6 @@
         let videos = [];
         let selectedFiles = [];
 
-        // ===== تحميل البيانات =====
         function loadData() {
             const savedUsers = localStorage.getItem('hasryat_users');
             if (savedUsers) {
@@ -790,12 +799,9 @@
             if (savedVideos) {
                 try {
                     videos = JSON.parse(savedVideos);
-                    console.log('✅ تم تحميل المقاطع:', videos.length);
                 } catch (e) {
                     videos = [];
                 }
-            } else {
-                videos = [];
             }
             
             const savedUser = localStorage.getItem('hasryat_current_user');
@@ -816,14 +822,13 @@
             }
             
             updateUI();
-            updateButtons(); // تأكيد تحديث الأزرار
+            updateButtons();
         }
 
         function saveData() {
             localStorage.setItem('hasryat_users', JSON.stringify(users));
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
-            console.log('✅ تم حفظ المقاطع:', videos.length);
-            updateButtons(); // تحديث الأزرار بعد الحفظ
+            updateButtons(); // تحديث فوري
         }
 
         function updateUI() {
@@ -852,7 +857,6 @@
             }
         }
 
-        // ===== تحديث الأزرار =====
         function updateButtons() {
             const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
@@ -884,8 +888,6 @@
                 `;
                 buttonsGrid.appendChild(button);
             }
-            
-            console.log('✅ تم تحديث الأزرار:', totalButtons);
         }
 
         function showVideosPage(btnNum, start, end) {
@@ -947,7 +949,6 @@
             a.click();
         };
 
-        // ===== رفع الملفات =====
         document.getElementById('fileInput').onchange = function(e) {
             selectedFiles = Array.from(this.files);
             document.getElementById('counter').textContent = selectedFiles.length + ' مقطع';
@@ -985,15 +986,18 @@
                 });
             }
             
-            saveData(); // هذا راح يحفظ ويحدث الأزرار
+            saveData();
             
+            // إخفاء مؤشر التحميل
             progress.style.display = 'none';
+            
+            // الرجوع للصفحة الرئيسية
             document.getElementById('backBtn').click();
             
+            // رسالة نجاح
             alert(`✅ تم رفع ${selectedFiles.length} مقاطع بنجاح!`);
         };
 
-        // ===== أزرار المطور الجديدة =====
         document.getElementById('refreshBtn').onclick = () => {
             updateButtons();
             alert('🔄 تم تحديث الأزرار');
@@ -1017,7 +1021,6 @@
             document.getElementById('deleteAllModal').classList.remove('active');
         };
 
-        // ===== أحداث تسجيل الدخول =====
         document.getElementById('userName').onclick = () => {
             if (!currentUser) document.getElementById('loginModal').classList.add('active');
         };
@@ -1076,6 +1079,7 @@
         };
 
         document.getElementById('logoutBtn').onclick = () => document.getElementById('exitModal').classList.add('active');
+        
         document.getElementById('confirmExit').onclick = () => {
             localStorage.removeItem('hasryat_current_user');
             currentUser = null;
@@ -1086,7 +1090,6 @@
             document.getElementById('buttonsGrid').style.display = 'grid';
         };
 
-        // ===== أزرار التنقل =====
         document.getElementById('showUploadBtn').onclick = () => {
             document.querySelector('.buttons-header').style.display = 'none';
             document.getElementById('buttonsGrid').style.display = 'none';
@@ -1100,6 +1103,7 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('filesList').innerHTML = '';
             document.getElementById('counter').textContent = '0 مقطع';
+            document.getElementById('uploadBtn').disabled = true;
         };
         
         document.getElementById('closeVideosPage').onclick = () => {
@@ -1116,7 +1120,6 @@
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
         };
 
-        // بدء التشغيل
         loadData();
     </script>
 </body>
