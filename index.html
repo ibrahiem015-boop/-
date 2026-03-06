@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حصريات - نظام بايثون السريع</title>
+    <title>حصريات - رفع سريع</title>
     <style>
         * {
             margin: 0;
@@ -16,7 +16,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             color: white;
             padding: 15px;
-            min-height: 100vh;
         }
 
         .container {
@@ -194,7 +193,6 @@
             background: #ff4757;
         }
 
-        /* ===== 30 زر جاهز دائماً ===== */
         .buttons-header {
             display: flex;
             justify-content: space-between;
@@ -325,6 +323,11 @@
             color: #4ecdc4;
             font-size: 60px;
             background: #222;
+            transition: 0.3s;
+        }
+
+        .file-label:hover {
+            background: #333;
         }
 
         #fileInput {
@@ -380,6 +383,10 @@
             margin-top: 15px;
             cursor: pointer;
             padding: 10px;
+        }
+
+        .back-btn:hover {
+            color: #4ecdc4;
         }
 
         .upload-progress {
@@ -524,12 +531,12 @@
             justify-content: space-between;
             color: #888;
             font-size: 11px;
-            margin-bottom: 10px;
         }
 
         .video-actions {
             display: flex;
             gap: 8px;
+            margin-top: 10px;
         }
 
         .action-btn {
@@ -539,6 +546,7 @@
             border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         .play-btn {
@@ -546,10 +554,20 @@
             color: black;
         }
 
+        .play-btn:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
         .download-btn {
             background: #333;
             color: #4ecdc4;
             border: 1px solid #4ecdc4;
+        }
+
+        .download-btn:hover {
+            background: #4ecdc4;
+            color: black;
         }
 
         .download-btn.dev-only {
@@ -722,7 +740,7 @@
 
     <div class="container">
         <div class="animated-header">
-            ✨ حصريات - 30 زر جاهز دائماً ✨
+            ✨ حصريات - رفع سريع ✨
         </div>
 
         <div class="navbar">
@@ -740,7 +758,7 @@
                 <div class="stat-label">إجمالي المقاطع</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="totalButtons">30</div>
+                <div class="stat-value" id="totalButtons">0</div>
                 <div class="stat-label">عدد الأزرار</div>
             </div>
             <div class="stat-item">
@@ -765,8 +783,8 @@
         </div>
 
         <div class="buttons-header">
-            <span class="buttons-title">📌 30 زر جاهز</span>
-            <span class="total-badge" id="buttonsCount">0/30</span>
+            <span class="buttons-title">📌 الأزرار المتاحة</span>
+            <span class="total-badge" id="buttonsCount">0 زر</span>
         </div>
 
         <div class="buttons-grid" id="buttonsGrid"></div>
@@ -794,7 +812,6 @@
         const DEVELOPER_EMAIL = 'admin@hasryat.com';
         const DEVELOPER_PASSWORD = 'Admin@123';
         const VIDEOS_PER_BUTTON = 10;
-        const TOTAL_BUTTONS = 30; // 30 زر جاهز دائماً
 
         let users = {
             [DEVELOPER_EMAIL]: {
@@ -810,7 +827,6 @@
         let videos = [];
         let selectedFiles = [];
 
-        // ===== تحميل البيانات =====
         function loadData() {
             const savedUsers = localStorage.getItem('hasryat_users');
             if (savedUsers) {
@@ -855,13 +871,13 @@
             }
             
             updateUI();
-            updateButtons(); // تحديث الأزرار فوراً
+            updateButtons();
         }
 
         function saveData() {
             localStorage.setItem('hasryat_users', JSON.stringify(users));
             localStorage.setItem('hasryat_videos', JSON.stringify(videos));
-            updateButtons(); // تحديث فوري بعد الحفظ
+            updateButtons();
         }
 
         function updateUI() {
@@ -890,47 +906,37 @@
             }
         }
 
-        // ===== تحديث الأزرار - 30 زر جاهز دائماً =====
         function updateButtons() {
             const buttonsGrid = document.getElementById('buttonsGrid');
             const totalVideos = videos.length;
-            const activeButtons = Math.min(Math.ceil(totalVideos / VIDEOS_PER_BUTTON), TOTAL_BUTTONS);
+            const totalButtons = Math.ceil(totalVideos / VIDEOS_PER_BUTTON);
             
             document.getElementById('totalVideos').textContent = totalVideos;
-            document.getElementById('buttonsCount').textContent = `${activeButtons}/${TOTAL_BUTTONS}`;
+            document.getElementById('totalButtons').textContent = totalButtons;
+            document.getElementById('buttonsCount').textContent = totalButtons + ' زر';
             
             buttonsGrid.innerHTML = '';
             
-            // نعرض 30 زر دائماً
-            for (let i = 1; i <= TOTAL_BUTTONS; i++) {
+            if (totalButtons === 0) {
+                buttonsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">📭 لا توجد أزرار بعد</div>';
+                return;
+            }
+            
+            for (let i = 1; i <= totalButtons; i++) {
                 const start = (i - 1) * VIDEOS_PER_BUTTON + 1;
-                const end = i * VIDEOS_PER_BUTTON;
-                
-                // نشوف إذا هذا الزر فيه مقاطع
-                const hasVideos = videos.length >= start;
+                const end = Math.min(i * VIDEOS_PER_BUTTON, totalVideos);
+                const count = end - start + 1;
                 
                 const button = document.createElement('div');
-                button.className = `page-button ${hasVideos ? 'has-videos' : 'empty'}`;
+                button.className = 'page-button has-videos';
+                button.onclick = () => showVideosPage(i, start, end);
                 
-                if (hasVideos) {
-                    const actualEnd = Math.min(end, videos.length);
-                    const count = actualEnd - start + 1;
-                    
-                    button.onclick = () => showVideosPage(i, start, actualEnd);
-                    
-                    button.innerHTML = `
-                        <div class="video-badge">${count} مقطع</div>
-                        <div class="button-number">${i}</div>
-                        <div class="button-range">${start} - ${actualEnd}</div>
-                        <div class="button-count">جاهز</div>
-                    `;
-                } else {
-                    button.innerHTML = `
-                        <div class="button-number">${i}</div>
-                        <div class="button-range">${start} - ${end}</div>
-                        <div class="button-count">فارغ</div>
-                    `;
-                }
+                button.innerHTML = `
+                    <div class="video-badge">${count} مقطع</div>
+                    <div class="button-number">${i}</div>
+                    <div class="button-range">${start} - ${end}</div>
+                    <div class="button-count">اضغط للعرض</div>
+                `;
                 
                 buttonsGrid.appendChild(button);
             }
@@ -995,7 +1001,6 @@
             a.click();
         };
 
-        // ===== رفع الملفات =====
         document.getElementById('fileInput').onchange = function(e) {
             selectedFiles = Array.from(this.files);
             document.getElementById('counter').textContent = selectedFiles.length + ' مقطع';
@@ -1021,7 +1026,8 @@
                 document.getElementById('progressPercent').textContent = p + '%';
                 document.getElementById('progressDetails').textContent = `جاري رفع ${f.name} (${i+1}/${selectedFiles.length})`;
                 
-                await new Promise(r => setTimeout(r, 100)); // أسرع
+                // محاكاة رفع سريع
+                await new Promise(r => setTimeout(r, 100));
                 
                 const reader = new FileReader();
                 const base64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(f); });
@@ -1033,7 +1039,8 @@
                 });
             }
             
-            saveData(); // يحفظ ويحدث الأزرار فوراً
+            // حفظ البيانات
+            saveData();
             
             // إخفاء مؤشر التحميل
             progress.style.display = 'none';
@@ -1043,6 +1050,9 @@
             
             // رسالة نجاح
             alert(`✅ تم رفع ${selectedFiles.length} مقاطع بنجاح!`);
+            
+            // إعادة تمكين الزر
+            this.disabled = false;
         };
 
         document.getElementById('refreshBtn').onclick = () => {
